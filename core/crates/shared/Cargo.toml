@@ -1,0 +1,15 @@
+[package]
+name = "shared"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# 配置管理
+config = { workspace = true }
+dotenvy = { workspace = true }
+
+# 序列化
+serde = { workspace = true }
+
+# 错误处理
+thiserror = { workspace = true }

@@ -1,0 +1,23 @@
+[package]
+name = "infra"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# 依赖上层
+domain = { path = "../domain" }
+app = { path = "../app" }
+
+# 数据库
+sqlx = { workspace = true }
+
+# 异步运行时
+tokio = { workspace = true }
+
+# 日志
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+
+# 工具库
+serde = { workspace = true }
+anyhow = { workspace = true }

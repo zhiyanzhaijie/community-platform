@@ -1,0 +1,46 @@
+# Rust
+# Ignore all target directories in the project
+target/
+**/target/
+
+# Rust backup files
+**/*.rs.bk
+*.pdb
+
+# Cargo
+# Keep Cargo.lock for binary crates, ignore for libraries
+# Workspace will have its own Cargo.lock
+Cargo.lock
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+
+# Environment variables
+.env
+.env.local
+
+# Database
+*.db
+*.sqlite
+*.sqlite-shm
+*.sqlite-wal
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Build artifacts
+*.exe
+*.dll
+*.so
+*.dylib
+
+# AI
+WARP.md

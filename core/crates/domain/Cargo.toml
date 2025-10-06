@@ -1,0 +1,11 @@
+[package]
+name = "domain"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+# 核心业务层：零外部依赖，只有基础工具库
+serde = { workspace = true }
+uuid = { workspace = true }
+chrono = { workspace = true }
+thiserror = { workspace = true }

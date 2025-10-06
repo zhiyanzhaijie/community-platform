@@ -1,0 +1,14 @@
+[build]
+incremental = true
+
+# 使用更快的链接器（需要先安装：sudo pacman -S mold）
+# [target.x86_64-unknown-linux-gnu]
+# linker = "clang"
+# rustflags = ["-C", "link-arg=-fuse-ld=mold"]
+
+[alias]
+# 快速命令别名
+c = "check"
+b = "build"
+r = "run"
+t = "test"
