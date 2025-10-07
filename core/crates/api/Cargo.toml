@@ -25,6 +25,7 @@ tracing-subscriber = { workspace = true }
 # 序列化
 serde = { workspace = true }
 serde_json = { workspace = true }
+chrono = { workspace = true }
 
 # 安全
 argon2 = { workspace = true }

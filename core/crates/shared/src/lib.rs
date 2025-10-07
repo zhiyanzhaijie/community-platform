@@ -1,14 +1,12 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! # Shared Crate
+//! 提供配置管理、统一错误类型、常量定义等共享功能
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod config;
+pub mod constants;
+pub mod error;
+pub mod types;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// 重导出常用类型
+pub use config::AppConfig;
+pub use error::{AppError, Result};
+pub use types::Id;

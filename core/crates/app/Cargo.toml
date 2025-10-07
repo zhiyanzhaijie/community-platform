@@ -4,15 +4,15 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# 依赖 domain 层
+# 依赖层
 domain = { path = "../domain" }
+shared = { path = "../shared" }
 
 # 异步运行时
 tokio = { workspace = true }
 
+# 安全
+argon2 = { workspace = true }
+
 # 日志
 tracing = { workspace = true }
-
-# 错误处理
-thiserror = { workspace = true }
-anyhow = { workspace = true }

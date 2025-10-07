@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! 基础设施层
+//! 提供数据持久化、日志等基础设施实现
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod persistence;
+pub mod tracing_setup;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+pub use persistence::postgres::{create_pool, PgPool, PostgresMemberRepository};
+pub use tracing_setup::init_tracing;

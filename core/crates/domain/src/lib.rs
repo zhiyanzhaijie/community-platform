@@ -1,14 +1,8 @@
-pub fn add(left: u64, right: u64) -> u64 {
-    left + right
-}
+//! 领域层
+//! 包含核心业务逻辑和领域模型
 
-#[cfg(test)]
-mod tests {
-    use super::*;
+pub mod member;
+pub mod tool;
 
-    #[test]
-    fn it_works() {
-        let result = add(2, 2);
-        assert_eq!(result, 4);
-    }
-}
+// 重导出共享类型
+pub use shared::{AppError, Result};
