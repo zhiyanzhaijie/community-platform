@@ -31,22 +31,25 @@ impl Member {
         }
     }
 
+    /// 修改状态（私有方法）
+    fn change_status(&mut self, new_status: MemberStatus) {
+        self.status = new_status;
+        self.updated_at = Utc::now();
+    }
+
     /// 激活会员
     pub fn activate(&mut self) {
-        self.status = MemberStatus::Active;
-        self.updated_at = Utc::now();
+        self.change_status(MemberStatus::Active);
     }
 
     /// 停用会员
     pub fn deactivate(&mut self) {
-        self.status = MemberStatus::Inactive;
-        self.updated_at = Utc::now();
+        self.change_status(MemberStatus::Inactive);
     }
 
     /// 封禁会员
     pub fn ban(&mut self) {
-        self.status = MemberStatus::Banned;
-        self.updated_at = Utc::now();
+        self.change_status(MemberStatus::Banned);
     }
 
     /// 检查是否激活

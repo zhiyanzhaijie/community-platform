@@ -2,8 +2,6 @@
 
 use axum::{
     extract::State,
-    http::StatusCode,
-    response::{IntoResponse, Response},
     routing::post,
     Json, Router,
 };
@@ -18,13 +16,24 @@ use crate::{
 };
 use app::member::{login_member, register_member, LoginInput, RegisterInput};
 use domain::member::MemberRepository;
-use shared::AppConfig;
+use shared::{AppConfig, AppError};
 
 /// 应用状态
-#[derive(Clone)]
 pub struct AppState<R: MemberRepository> {
     pub member_repo: Arc<R>,
+    pub password_hasher: Arc<dyn infra::PasswordHasher>,
     pub config: Arc<AppConfig>,
+}
+
+// 手动实现 Clone（因为 R 不一定实现 Clone）
+impl<R: MemberRepository> Clone for AppState<R> {
+    fn clone(&self) -> Self {
+        Self {
+            member_repo: Arc::clone(&self.member_repo),
+            password_hasher: Arc::clone(&self.password_hasher),
+            config: Arc::clone(&self.config),
+        }
+    }
 }
 
 /// 会员路由
@@ -45,16 +54,13 @@ async fn register<R: MemberRepository>(
         password: req.password,
     };
 
-    let member = register_member(state.member_repo.as_ref(), input).await?;
-
-    let dto = MemberDto {
-        id: member.id.to_string(),
-        email: member.email.value().to_string(),
-        username: member.username.value().to_string(),
-        status: member.status.to_string(),
-        created_at: member.created_at.to_rfc3339(),
-    };
-
+    let member = register_member(
+        state.member_repo.as_ref(),
+        state.password_hasher.as_ref(),
+        input,
+    )
+    .await?;
+    let dto = MemberDto::from(&member);
     Ok(Json(ApiResponse::success(dto)))
 }
 
@@ -68,7 +74,12 @@ async fn login<R: MemberRepository>(
         password: req.password,
     };
 
-    let output = login_member(state.member_repo.as_ref(), input).await?;
+    let output = login_member(
+        state.member_repo.as_ref(),
+        state.password_hasher.as_ref(),
+        input,
+    )
+    .await?;
 
     // 生成 JWT token
     let token = generate_token(
@@ -77,37 +88,9 @@ async fn login<R: MemberRepository>(
         state.config.jwt.expires_in,
     )?;
 
-    let dto = MemberDto {
-        id: output.member.id.to_string(),
-        email: output.member.email.value().to_string(),
-        username: output.member.username.value().to_string(),
-        status: output.member.status.to_string(),
-        created_at: output.member.created_at.to_rfc3339(),
-    };
-
+    let dto = MemberDto::from(&output.member);
     let response = LoginResponse { token, member: dto };
 
     Ok(Json(ApiResponse::success(response)))
 }
 
-/// 错误处理
-use shared::AppError;
-
-impl IntoResponse for AppError {
-    fn into_response(self) -> Response {
-        let (status, message) = match self {
-            AppError::Validation(msg) => (StatusCode::BAD_REQUEST, msg),
-            AppError::NotFound(msg) => (StatusCode::NOT_FOUND, msg),
-            AppError::Unauthorized => (StatusCode::UNAUTHORIZED, "未授权".to_string()),
-            AppError::Forbidden => (StatusCode::FORBIDDEN, "权限不足".to_string()),
-            AppError::Internal(msg) => (StatusCode::INTERNAL_SERVER_ERROR, msg),
-            AppError::Config(e) => (
-                StatusCode::INTERNAL_SERVER_ERROR,
-                format!("配置错误: {}", e),
-            ),
-        };
-
-        let body = Json(ApiResponse::<()>::error(message));
-        (status, body).into_response()
-    }
-}

@@ -6,13 +6,11 @@ edition = "2021"
 [dependencies]
 # 依赖层
 domain = { path = "../domain" }
+infra = { path = "../infra" }
 shared = { path = "../shared" }
 
 # 异步运行时
 tokio = { workspace = true }
-
-# 安全
-argon2 = { workspace = true }
 
 # 日志
 tracing = { workspace = true }

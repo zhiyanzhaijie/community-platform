@@ -1,6 +1,5 @@
 //! 会员登录用例
 
-use argon2::{Argon2, PasswordHash, PasswordVerifier};
 use domain::member::{Email, Member, MemberRepository};
 use shared::{AppError, Result};
 use tracing::instrument;
@@ -19,13 +18,17 @@ pub struct LoginOutput {
 /// 会员登录
 #[instrument(
     name = "login_member",
-    skip(repo, input),
+    skip(repo, hasher, input),
     fields(email = %input.email)
 )]
-pub async fn login_member<R: MemberRepository>(
+pub async fn login_member<R>(
     repo: &R,
+    hasher: &dyn infra::PasswordHasher,
     input: LoginInput,
-) -> Result<LoginOutput> {
+) -> Result<LoginOutput>
+where
+    R: MemberRepository,
+{
     tracing::info!("开始会员登录");
 
     // 构建邮箱值对象
@@ -43,20 +46,11 @@ pub async fn login_member<R: MemberRepository>(
     }
 
     // 验证密码
-    verify_password(&input.password, &member.password_hash)?;
+    if !hasher.verify(&input.password, &member.password_hash)? {
+        return Err(AppError::validation("邮箱或密码错误"));
+    }
 
     tracing::info!(member_id = %member.id, "会员登录成功");
     Ok(LoginOutput { member })
 }
 
-/// 验证密码
-fn verify_password(password: &str, password_hash: &str) -> Result<()> {
-    let parsed_hash = PasswordHash::new(password_hash)
-        .map_err(|e| AppError::internal(format!("密码哈希解析失败: {}", e)))?;
-
-    let argon2 = Argon2::default();
-
-    argon2
-        .verify_password(password.as_bytes(), &parsed_hash)
-        .map_err(|_| AppError::validation("邮箱或密码错误"))
-}

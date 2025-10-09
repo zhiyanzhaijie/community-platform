@@ -75,3 +75,16 @@ impl std::fmt::Display for MemberStatus {
         }
     }
 }
+
+impl std::str::FromStr for MemberStatus {
+    type Err = AppError;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "active" => Ok(Self::Active),
+            "inactive" => Ok(Self::Inactive),
+            "banned" => Ok(Self::Banned),
+            _ => Err(AppError::validation(format!("无效的会员状态: {}", s))),
+        }
+    }
+}

@@ -1,9 +1,5 @@
 //! 会员注册用例
 
-use argon2::{
-    password_hash::{rand_core::OsRng, SaltString},
-    Argon2, PasswordHasher,
-};
 use domain::member::{Email, Member, MemberRepository, Username};
 use shared::{AppError, Result};
 use tracing::instrument;
@@ -18,16 +14,20 @@ pub struct RegisterInput {
 /// 注册会员
 #[instrument(
     name = "register_member",
-    skip(repo, input),
+    skip(repo, hasher, input),
     fields(
         email = %input.email,
         username = %input.username
     )
 )]
-pub async fn register_member<R: MemberRepository>(
+pub async fn register_member<R>(
     repo: &R,
+    hasher: &dyn infra::PasswordHasher,
     input: RegisterInput,
-) -> Result<Member> {
+) -> Result<Member>
+where
+    R: MemberRepository,
+{
     tracing::info!("开始注册会员");
 
     // 验证密码强度
@@ -50,7 +50,7 @@ pub async fn register_member<R: MemberRepository>(
     }
 
     // 哈希密码
-    let password_hash = hash_password(&input.password)?;
+    let password_hash = hasher.hash(&input.password)?;
 
     // 创建会员
     let member = Member::new(email, username, password_hash);
@@ -62,13 +62,3 @@ pub async fn register_member<R: MemberRepository>(
     Ok(member)
 }
 
-/// 哈希密码
-fn hash_password(password: &str) -> Result<String> {
-    let salt = SaltString::generate(&mut OsRng);
-    let argon2 = Argon2::default();
-
-    argon2
-        .hash_password(password.as_bytes(), &salt)
-        .map(|hash| hash.to_string())
-        .map_err(|e| AppError::internal(format!("密码哈希失败: {}", e)))
-}

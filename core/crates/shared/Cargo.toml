@@ -10,7 +10,11 @@ dotenvy = { workspace = true }
 
 # 序列化
 serde = { workspace = true }
+serde_json = { workspace = true }
 uuid = { workspace = true }
 
 # 错误处理
 thiserror = { workspace = true }
+
+# Web 框架（用于 IntoResponse）
+axum = { workspace = true }

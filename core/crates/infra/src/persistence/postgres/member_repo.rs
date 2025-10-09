@@ -1,10 +1,13 @@
 //! Member Repository PostgreSQL 实现
 
 use async_trait::async_trait;
-use domain::member::{Email, Member, MemberId, MemberRepository, MemberStatus, Username};
+use chrono::{DateTime, Utc};
+use domain::member::{Email, Member, MemberId, MemberRepository, Username};
 use shared::{AppError, Result};
-use sqlx::PgPool;
+use sqlx::{FromRow, PgPool};
+use std::convert::TryFrom;
 use tracing::instrument;
+use uuid::Uuid;
 
 /// PostgreSQL Member Repository
 pub struct PostgresMemberRepository {
@@ -14,6 +17,37 @@ pub struct PostgresMemberRepository {
 impl PostgresMemberRepository {
     pub fn new(pool: PgPool) -> Self {
         Self { pool }
+    }
+}
+
+/// 数据库行结构
+#[derive(Debug, Clone, FromRow)]
+struct MemberRow {
+    id: Uuid,
+    email: String,
+    username: String,
+    password_hash: String,
+    status: String,
+    created_at: DateTime<Utc>,
+    updated_at: DateTime<Utc>,
+}
+
+/// Row -> Domain 转换
+impl TryFrom<MemberRow> for Member {
+    type Error = AppError;
+
+    fn try_from(row: MemberRow) -> Result<Self> {
+        Ok(Member {
+            id: MemberId::from_uuid(row.id),
+            email: Email::new(row.email)
+                .map_err(|e| AppError::internal(format!("数据库中的邮箱格式无效: {}", e)))?,
+            username: Username::new(row.username)
+                .map_err(|e| AppError::internal(format!("数据库中的用户名格式无效: {}", e)))?,
+            password_hash: row.password_hash,
+            status: row.status.parse()?,
+            created_at: row.created_at,
+            updated_at: row.updated_at,
+        })
     }
 }
 
@@ -43,77 +77,44 @@ impl MemberRepository for PostgresMemberRepository {
 
     #[instrument(name = "find_member_by_id", skip(self))]
     async fn find_by_id(&self, id: MemberId) -> Result<Option<Member>> {
-        let record = sqlx::query!(
-            r#"
-            SELECT id, email, username, password_hash, status, created_at, updated_at
-            FROM members
-            WHERE id = $1
-            "#,
-            id.value()
+        sqlx::query_as::<_, MemberRow>(
+            "SELECT id, email, username, password_hash, status, created_at, updated_at 
+             FROM members WHERE id = $1"
         )
+        .bind(id.value())
         .fetch_optional(&self.pool)
         .await
-        .map_err(|e| AppError::internal(format!("查询会员失败: {}", e)))?;
-
-        Ok(record.map(|r| Member {
-            id: MemberId::from_uuid(r.id),
-            email: Email::new(r.email).unwrap(),
-            username: Username::new(r.username).unwrap(),
-            password_hash: r.password_hash,
-            status: parse_member_status(&r.status),
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-        }))
+        .map_err(|e| AppError::internal(format!("查询失败: {}", e)))?
+        .map(Member::try_from)
+        .transpose()
     }
 
     #[instrument(name = "find_member_by_email", skip(self))]
     async fn find_by_email(&self, email: &Email) -> Result<Option<Member>> {
-        let record = sqlx::query!(
-            r#"
-            SELECT id, email, username, password_hash, status, created_at, updated_at
-            FROM members
-            WHERE email = $1
-            "#,
-            email.value()
+        sqlx::query_as::<_, MemberRow>(
+            "SELECT id, email, username, password_hash, status, created_at, updated_at 
+             FROM members WHERE email = $1"
         )
+        .bind(email.value())
         .fetch_optional(&self.pool)
         .await
-        .map_err(|e| AppError::internal(format!("查询会员失败: {}", e)))?;
-
-        Ok(record.map(|r| Member {
-            id: MemberId::from_uuid(r.id),
-            email: Email::new(r.email).unwrap(),
-            username: Username::new(r.username).unwrap(),
-            password_hash: r.password_hash,
-            status: parse_member_status(&r.status),
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-        }))
+        .map_err(|e| AppError::internal(format!("查询失败: {}", e)))?
+        .map(Member::try_from)
+        .transpose()
     }
 
     #[instrument(name = "find_member_by_username", skip(self))]
     async fn find_by_username(&self, username: &Username) -> Result<Option<Member>> {
-        let record = sqlx::query!(
-            r#"
-            SELECT id, email, username, password_hash, status, created_at, updated_at
-            FROM members
-            WHERE username = $1
-            "#,
-            username.value()
+        sqlx::query_as::<_, MemberRow>(
+            "SELECT id, email, username, password_hash, status, created_at, updated_at 
+             FROM members WHERE username = $1"
         )
+        .bind(username.value())
         .fetch_optional(&self.pool)
         .await
-        .map_err(|e| AppError::internal(format!("查询会员失败: {}", e)))?;
-
-        Ok(record.map(|r| Member {
-            id: MemberId::from_uuid(r.id),
-            email: Email::new(r.email).unwrap(),
-            username: Username::new(r.username).unwrap(),
-            password_hash: r.password_hash,
-            status: parse_member_status(&r.status),
-            created_at: r.created_at,
-            updated_at: r.updated_at,
-        }))
+        .map_err(|e| AppError::internal(format!("查询失败: {}", e)))?
+        .map(Member::try_from)
+        .transpose()
     }
 
     #[instrument(name = "update_member", skip(self, member))]
@@ -140,26 +141,11 @@ impl MemberRepository for PostgresMemberRepository {
 
     #[instrument(name = "delete_member", skip(self))]
     async fn delete(&self, id: MemberId) -> Result<()> {
-        sqlx::query!(
-            r#"
-            DELETE FROM members WHERE id = $1
-            "#,
-            id.value()
-        )
-        .execute(&self.pool)
-        .await
-        .map_err(|e| AppError::internal(format!("删除会员失败: {}", e)))?;
+        sqlx::query!("DELETE FROM members WHERE id = $1", id.value())
+            .execute(&self.pool)
+            .await
+            .map_err(|e| AppError::internal(format!("删除失败: {}", e)))?;
 
         Ok(())
-    }
-}
-
-/// 解析会员状态
-fn parse_member_status(status: &str) -> MemberStatus {
-    match status {
-        "active" => MemberStatus::Active,
-        "inactive" => MemberStatus::Inactive,
-        "banned" => MemberStatus::Banned,
-        _ => MemberStatus::Active,
     }
 }

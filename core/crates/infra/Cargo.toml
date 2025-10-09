@@ -6,7 +6,6 @@ edition = "2021"
 [dependencies]
 # 依赖层
 domain = { path = "../domain" }
-app = { path = "../app" }
 shared = { path = "../shared" }
 
 # 数据库
@@ -15,6 +14,13 @@ sqlx = { workspace = true }
 # 异步
 tokio = { workspace = true }
 async-trait = { workspace = true }
+
+# 工具库
+chrono = { workspace = true }
+uuid = { workspace = true }
+
+# 安全
+argon2 = { workspace = true }
 
 # 日志
 tracing = { workspace = true }

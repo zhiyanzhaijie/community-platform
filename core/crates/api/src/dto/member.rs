@@ -1,5 +1,6 @@
 //! 会员 DTO
 
+use domain::member::Member;
 use serde::{Deserialize, Serialize};
 
 /// 注册请求
@@ -32,4 +33,17 @@ pub struct MemberDto {
     pub username: String,
     pub status: String,
     pub created_at: String,
+}
+
+/// Member -> MemberDto 转换
+impl From<&Member> for MemberDto {
+    fn from(member: &Member) -> Self {
+        Self {
+            id: member.id.to_string(),
+            email: member.email.value().to_string(),
+            username: member.username.value().to_string(),
+            status: member.status.to_string(),
+            created_at: member.created_at.to_rfc3339(),
+        }
+    }
 }

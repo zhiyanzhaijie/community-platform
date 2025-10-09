@@ -17,6 +17,7 @@ pub async fn create_pool(
         .max_connections(max_connections)
         .min_connections(min_connections)
         .acquire_timeout(Duration::from_secs(acquire_timeout))
+        .max_lifetime(Duration::from_secs(connect_timeout))
         .idle_timeout(Some(Duration::from_secs(600)))
         .test_before_acquire(true)
         .connect(database_url)
