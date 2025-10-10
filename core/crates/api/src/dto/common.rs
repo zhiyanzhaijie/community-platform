@@ -1,6 +1,7 @@
 //! 通用 DTO
 
 use serde::{Deserialize, Serialize};
+use utoipa::ToSchema;
 
 /// API 响应
 #[derive(Debug, Serialize)]
@@ -29,7 +30,7 @@ impl<T> ApiResponse<T> {
 }
 
 /// 分页请求
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, ToSchema)]
 pub struct PaginationQuery {
     #[serde(default = "default_page")]
     pub page: i64,

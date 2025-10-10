@@ -1,27 +1,28 @@
 //! 路由配置
 
-use axum::{
-    http::StatusCode,
-    response::Json,
-    routing::get,
-    Router,
-};
+use axum::{http::StatusCode, response::Json, routing::get, Router};
 use serde_json::{json, Value};
 use shared::constants::API_VERSION_V1;
+use utoipa::OpenApi;
+use utoipa_swagger_ui::SwaggerUi;
+
+use crate::{openapi::ApiDoc, v1::member::AppState};
 
 /// 应用路由
-pub fn app_routes() -> Router {
+pub fn app_routes(state: AppState) -> Router {
     Router::new()
-        .nest(API_VERSION_V1, v1_routes())
+        .merge(SwaggerUi::new("/api/docs").url("/api/openapi.json", ApiDoc::openapi()))
+        .nest(API_VERSION_V1, v1_routes(state))
         .route("/health", get(health_check))
         .route("/ready", get(readiness_check))
 }
 
 /// v1 版本路由
-fn v1_routes() -> Router {
+fn v1_routes(state: AppState) -> Router {
     Router::new()
-    // TODO: 添加业务路由
-    // .nest("/members", crate::v1::member::routes())
+        .nest("/members", crate::v1::member::routes())
+        .with_state(state)
+    // TODO: 添加其他业务路由
     // .nest("/tools", crate::v1::tool::routes())
     // .nest("/transactions", crate::v1::transaction::routes())
 }

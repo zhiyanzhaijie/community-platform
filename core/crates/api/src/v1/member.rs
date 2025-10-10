@@ -1,10 +1,6 @@
 //! 会员 API 端点
 
-use axum::{
-    extract::State,
-    routing::post,
-    Json, Router,
-};
+use axum::{extract::State, routing::post, Json, Router};
 use std::sync::Arc;
 
 use crate::{
@@ -19,33 +15,24 @@ use domain::member::MemberRepository;
 use shared::{AppConfig, AppError};
 
 /// 应用状态
-pub struct AppState<R: MemberRepository> {
-    pub member_repo: Arc<R>,
+#[derive(Clone)]
+pub struct AppState {
+    pub member_repo: Arc<dyn MemberRepository>,
     pub password_hasher: Arc<dyn infra::PasswordHasher>,
     pub config: Arc<AppConfig>,
 }
 
-// 手动实现 Clone（因为 R 不一定实现 Clone）
-impl<R: MemberRepository> Clone for AppState<R> {
-    fn clone(&self) -> Self {
-        Self {
-            member_repo: Arc::clone(&self.member_repo),
-            password_hasher: Arc::clone(&self.password_hasher),
-            config: Arc::clone(&self.config),
-        }
-    }
-}
-
 /// 会员路由
-pub fn routes<R: MemberRepository + 'static>() -> Router<AppState<R>> {
+pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/register", post(register))
         .route("/login", post(login))
 }
 
 /// 注册
-async fn register<R: MemberRepository>(
-    State(state): State<AppState<R>>,
+#[utoipa::path(post, path = "/api/v1/members/register", tag = "members")]
+async fn register(
+    State(state): State<AppState>,
     Json(req): Json<RegisterRequest>,
 ) -> Result<Json<ApiResponse<MemberDto>>, AppError> {
     let input = RegisterInput {
@@ -65,8 +52,9 @@ async fn register<R: MemberRepository>(
 }
 
 /// 登录
-async fn login<R: MemberRepository>(
-    State(state): State<AppState<R>>,
+#[utoipa::path(post, path = "/api/v1/members/login", tag = "members")]
+async fn login(
+    State(state): State<AppState>,
     Json(req): Json<LoginRequest>,
 ) -> Result<Json<ApiResponse<LoginResponse>>, AppError> {
     let input = LoginInput {
@@ -93,4 +81,3 @@ async fn login<R: MemberRepository>(
 
     Ok(Json(ApiResponse::success(response)))
 }
-

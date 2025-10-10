@@ -39,3 +39,7 @@ dotenvy = { workspace = true }
 
 # 错误处理
 anyhow = { workspace = true }
+
+# API 文档
+utoipa = { workspace = true }
+utoipa-swagger-ui = { workspace = true }

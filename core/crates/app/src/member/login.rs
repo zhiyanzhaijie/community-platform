@@ -21,14 +21,11 @@ pub struct LoginOutput {
     skip(repo, hasher, input),
     fields(email = %input.email)
 )]
-pub async fn login_member<R>(
-    repo: &R,
+pub async fn login_member(
+    repo: &dyn MemberRepository,
     hasher: &dyn infra::PasswordHasher,
     input: LoginInput,
-) -> Result<LoginOutput>
-where
-    R: MemberRepository,
-{
+) -> Result<LoginOutput> {
     tracing::info!("开始会员登录");
 
     // 构建邮箱值对象

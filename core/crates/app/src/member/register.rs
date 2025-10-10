@@ -20,14 +20,11 @@ pub struct RegisterInput {
         username = %input.username
     )
 )]
-pub async fn register_member<R>(
-    repo: &R,
+pub async fn register_member(
+    repo: &dyn MemberRepository,
     hasher: &dyn infra::PasswordHasher,
     input: RegisterInput,
-) -> Result<Member>
-where
-    R: MemberRepository,
-{
+) -> Result<Member> {
     tracing::info!("开始注册会员");
 
     // 验证密码强度

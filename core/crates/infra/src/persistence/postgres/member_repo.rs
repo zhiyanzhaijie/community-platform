@@ -79,7 +79,7 @@ impl MemberRepository for PostgresMemberRepository {
     async fn find_by_id(&self, id: MemberId) -> Result<Option<Member>> {
         sqlx::query_as::<_, MemberRow>(
             "SELECT id, email, username, password_hash, status, created_at, updated_at 
-             FROM members WHERE id = $1"
+             FROM members WHERE id = $1",
         )
         .bind(id.value())
         .fetch_optional(&self.pool)
@@ -93,7 +93,7 @@ impl MemberRepository for PostgresMemberRepository {
     async fn find_by_email(&self, email: &Email) -> Result<Option<Member>> {
         sqlx::query_as::<_, MemberRow>(
             "SELECT id, email, username, password_hash, status, created_at, updated_at 
-             FROM members WHERE email = $1"
+             FROM members WHERE email = $1",
         )
         .bind(email.value())
         .fetch_optional(&self.pool)
@@ -107,7 +107,7 @@ impl MemberRepository for PostgresMemberRepository {
     async fn find_by_username(&self, username: &Username) -> Result<Option<Member>> {
         sqlx::query_as::<_, MemberRow>(
             "SELECT id, email, username, password_hash, status, created_at, updated_at 
-             FROM members WHERE username = $1"
+             FROM members WHERE username = $1",
         )
         .bind(username.value())
         .fetch_optional(&self.pool)
