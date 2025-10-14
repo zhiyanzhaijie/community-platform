@@ -2,6 +2,6 @@
 
 pub mod common;
 pub mod member;
+pub mod tool;
 
-// pub mod tool;
 // pub mod transaction;

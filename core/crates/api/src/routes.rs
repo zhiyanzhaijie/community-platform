@@ -6,7 +6,7 @@ use shared::constants::API_VERSION_V1;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::{openapi::ApiDoc, v1::member::AppState};
+use crate::{openapi::ApiDoc, AppState};
 
 /// 应用路由
 pub fn app_routes(state: AppState) -> Router {
@@ -21,9 +21,9 @@ pub fn app_routes(state: AppState) -> Router {
 fn v1_routes(state: AppState) -> Router {
     Router::new()
         .nest("/members", crate::v1::member::routes())
+        .nest("/tools", crate::v1::tool::routes())
         .with_state(state)
     // TODO: 添加其他业务路由
-    // .nest("/tools", crate::v1::tool::routes())
     // .nest("/transactions", crate::v1::transaction::routes())
 }
 

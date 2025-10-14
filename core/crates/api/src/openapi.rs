@@ -3,7 +3,7 @@
 use utoipa::OpenApi;
 
 use crate::dto::{
-    common::{ApiResponse, PaginatedResponse, PaginationQuery},
+    common::PaginationQuery,
     member::{LoginRequest, LoginResponse, MemberDto, RegisterRequest},
 };
 

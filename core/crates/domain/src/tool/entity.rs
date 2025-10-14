@@ -65,22 +65,24 @@ impl Tool {
         self.updated_at = Utc::now();
     }
 
+    fn change_status(&mut self, new_status: ToolStatus) {
+        self.status = new_status;
+        self.updated_at = Utc::now();
+    }
+
     /// 标记为已出租
     pub fn rent(&mut self) {
-        self.status = ToolStatus::Rented;
-        self.updated_at = Utc::now();
+        self.change_status(ToolStatus::Rented);
     }
 
     /// 标记为可用
     pub fn make_available(&mut self) {
-        self.status = ToolStatus::Available;
-        self.updated_at = Utc::now();
+        self.change_status(ToolStatus::Available);
     }
 
     /// 标记为不可用
     pub fn make_unavailable(&mut self) {
-        self.status = ToolStatus::Unavailable;
-        self.updated_at = Utc::now();
+        self.change_status(ToolStatus::Unavailable);
     }
 
     /// 检查是否可用

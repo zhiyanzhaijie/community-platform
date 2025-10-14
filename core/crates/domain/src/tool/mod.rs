@@ -6,7 +6,7 @@ mod value_objects;
 
 pub use entity::Tool;
 pub use repository::ToolRepository;
-pub use value_objects::{Money, ToolStatus};
+pub use value_objects::{Currency, Money, ToolStatus};
 
 // 类型别名
 pub type ToolId = shared::Id<Tool>;

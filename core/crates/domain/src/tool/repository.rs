@@ -15,7 +15,12 @@ pub trait ToolRepository: Send + Sync {
     async fn find_by_id(&self, id: ToolId) -> Result<Option<Tool>>;
 
     /// 根据所有者查找
-    async fn find_by_owner(&self, owner_id: MemberId, page: i64, page_size: i64) -> Result<Vec<Tool>>;
+    async fn find_by_owner(
+        &self,
+        owner_id: MemberId,
+        page: i64,
+        page_size: i64,
+    ) -> Result<Vec<Tool>>;
 
     /// 查找所有可用工具（分页）
     async fn find_available(&self, page: i64, page_size: i64) -> Result<Vec<Tool>>;

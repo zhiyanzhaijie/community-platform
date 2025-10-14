@@ -1,7 +1,6 @@
 //! 会员 API 端点
 
 use axum::{extract::State, routing::post, Json, Router};
-use std::sync::Arc;
 
 use crate::{
     dto::{
@@ -9,18 +8,10 @@ use crate::{
         member::{LoginRequest, LoginResponse, MemberDto, RegisterRequest},
     },
     middleware::auth::generate_token,
+    AppState,
 };
 use app::member::{login_member, register_member, LoginInput, RegisterInput};
-use domain::member::MemberRepository;
-use shared::{AppConfig, AppError};
-
-/// 应用状态
-#[derive(Clone)]
-pub struct AppState {
-    pub member_repo: Arc<dyn MemberRepository>,
-    pub password_hasher: Arc<dyn infra::PasswordHasher>,
-    pub config: Arc<AppConfig>,
-}
+use shared::AppError;
 
 /// 会员路由
 pub fn routes() -> Router<AppState> {
