@@ -26,14 +26,11 @@ pub struct CreateToolInput {
         name = %input.name
     )
 )]
-pub async fn create_tool(
-    repo: &dyn ToolRepository,
-    input: CreateToolInput,
-) -> Result<Tool> {
+pub async fn create_tool(repo: &dyn ToolRepository, input: CreateToolInput) -> Result<Tool> {
     tracing::info!("开始创建工具");
 
     // 构建价格值对象
-    let currency = parse_currency(&input.price_currency);
+    let currency = Currency::from_str(&input.price_currency);
     let price = Money::new(input.price_amount, currency)?;
 
     // 创建工具
@@ -72,10 +69,7 @@ pub struct UpdateToolInput {
         requester_id = %input.requester_id
     )
 )]
-pub async fn update_tool(
-    repo: &dyn ToolRepository,
-    input: UpdateToolInput,
-) -> Result<Tool> {
+pub async fn update_tool(repo: &dyn ToolRepository, input: UpdateToolInput) -> Result<Tool> {
     tracing::info!("开始更新工具");
 
     // 获取工具
@@ -91,7 +85,7 @@ pub async fn update_tool(
 
     // 构建价格值对象（如果提供）
     let price = if let (Some(amount), Some(currency)) = (input.price_amount, input.price_currency) {
-        let currency = parse_currency(&currency);
+        let currency = Currency::from_str(&currency);
         Some(Money::new(amount, currency)?)
     } else {
         None
@@ -120,16 +114,8 @@ pub async fn delete_tool(
 ) -> Result<()> {
     tracing::info!("开始删除工具");
 
-    // 获取工具
-    let tool = repo
-        .find_by_id(tool_id)
-        .await?
-        .ok_or_else(|| AppError::not_found("工具不存在"))?;
-
-    // 检查权限：只有所有者可以删除
-    if tool.owner_id != requester_id {
-        return Err(AppError::Forbidden);
-    }
+    // 检查权限并获取工具
+    let _tool = check_owner(repo, tool_id, requester_id).await?;
 
     // 删除工具
     repo.delete(tool_id).await?;
@@ -138,10 +124,21 @@ pub async fn delete_tool(
     Ok(())
 }
 
-// 辅助函数：解析货币类型
-fn parse_currency(currency: &str) -> Currency {
-    match currency.to_uppercase().as_str() {
-        "USD" => Currency::USD,
-        _ => Currency::CNY, // 默认人民币
+// 辅助函数：检查工具所有者权限
+async fn check_owner(
+    repo: &dyn ToolRepository,
+    tool_id: ToolId,
+    requester_id: MemberId,
+) -> Result<Tool> {
+    let tool = repo
+        .find_by_id(tool_id)
+        .await?
+        .ok_or_else(|| AppError::not_found("工具不存在"))?;
+
+    if tool.owner_id != requester_id {
+        return Err(AppError::Forbidden);
     }
+
+    Ok(tool)
 }
+

@@ -51,6 +51,27 @@ impl std::fmt::Display for Username {
     }
 }
 
+/// 密码（原始密码，未哈希）
+#[derive(Debug, Clone)]
+pub struct Password(String);
+
+impl Password {
+    /// 创建密码，验证密码强度
+    pub fn new(value: impl Into<String>) -> Result<Self> {
+        let value = value.into();
+        if value.len() < 8 {
+            return Err(AppError::validation("密码长度至少8位"));
+        }
+        // 未来可以添加更多密码强度验证：大小写、数字、特殊字符等
+        Ok(Self(value))
+    }
+
+    /// 获取密码值（用于哈希）
+    pub fn value(&self) -> &str {
+        &self.0
+    }
+}
+
 /// 会员状态
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]

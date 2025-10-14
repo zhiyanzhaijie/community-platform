@@ -1,6 +1,6 @@
 //! 工具 DTO
 
-use domain::tool::{Money, Tool, ToolStatus};
+use domain::tool::{Currency, Money, Tool};
 use serde::{Deserialize, Serialize};
 use utoipa::ToSchema;
 
@@ -71,8 +71,8 @@ impl From<&Tool> for ToolDto {
 impl From<&Money> for MoneyDto {
     fn from(money: &Money) -> Self {
         let currency = match money.currency {
-            domain::tool::value_objects::Currency::CNY => "CNY",
-            domain::tool::value_objects::Currency::USD => "USD",
+            Currency::CNY => "CNY",
+            Currency::USD => "USD",
         };
         Self {
             amount: money.amount,

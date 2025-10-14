@@ -30,6 +30,16 @@ pub enum Currency {
     USD,
 }
 
+impl Currency {
+    /// 从字符串解析货币类型，默认为 CNY
+    pub fn from_str(s: &str) -> Self {
+        match s.to_uppercase().as_str() {
+            "USD" => Self::USD,
+            _ => Self::CNY, // 默认人民币
+        }
+    }
+}
+
 /// 工具状态
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]

@@ -9,7 +9,7 @@ use axum::{
 use crate::{
     dto::{
         common::{ApiResponse, PaginatedResponse, PaginationQuery},
-        tool::{CreateToolRequest, ToolDto, ToolListResponse, UpdateToolRequest},
+        tool::{CreateToolRequest, ToolDto, UpdateToolRequest},
     },
     AppState,
 };
@@ -36,7 +36,7 @@ pub fn routes() -> Router<AppState> {
 /// TODO: 需要认证，从 JWT token 中获取 owner_id
 #[utoipa::path(post, path = "/api/v1/tools", tag = "tools")]
 async fn create_tool_handler(
-    State(state): State<ToolAppState>,
+    State(state): State<AppState>,
     Json(req): Json<CreateToolRequest>,
 ) -> Result<Json<ApiResponse<ToolDto>>, AppError> {
     // TODO: 从认证中间件获取当前用户 ID
@@ -61,10 +61,10 @@ async fn create_tool_handler(
 /// 获取工具详情
 #[utoipa::path(get, path = "/api/v1/tools/{id}", tag = "tools")]
 async fn get_tool_handler(
-    State(state): State<ToolAppState>,
+    State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<ApiResponse<ToolDto>>, AppError> {
-    let tool_id = Id::from_string(&id).map_err(|_| AppError::validation("无效的工具 ID"))?;
+    let tool_id = parse_id(&id, "无效的工具 ID")?;
 
     let tool = get_tool(state.tool_repo.as_ref(), tool_id).await?;
     let dto = ToolDto::from(&tool);
@@ -75,7 +75,7 @@ async fn get_tool_handler(
 /// 列出可用工具（分页）
 #[utoipa::path(get, path = "/api/v1/tools", tag = "tools")]
 async fn list_tools_handler(
-    State(state): State<ToolAppState>,
+    State(state): State<AppState>,
     Query(pagination): Query<PaginationQuery>,
 ) -> Result<Json<ApiResponse<PaginatedResponse<ToolDto>>>, AppError> {
     let tools = list_available_tools(
@@ -98,11 +98,11 @@ async fn list_tools_handler(
 /// TODO: 需要认证，验证当前用户是工具的所有者
 #[utoipa::path(put, path = "/api/v1/tools/{id}", tag = "tools")]
 async fn update_tool_handler(
-    State(state): State<ToolAppState>,
+    State(state): State<AppState>,
     Path(id): Path<String>,
     Json(req): Json<UpdateToolRequest>,
 ) -> Result<Json<ApiResponse<ToolDto>>, AppError> {
-    let tool_id = Id::from_string(&id).map_err(|_| AppError::validation("无效的工具 ID"))?;
+    let tool_id = parse_id(&id, "无效的工具 ID")?;
 
     // TODO: 从认证中间件获取当前用户 ID
     let requester_id = MemberId::new(); // 实际应该从 JWT Claims 中获取
@@ -128,13 +128,13 @@ async fn update_tool_handler(
 /// TODO: 需要认证，验证当前用户是工具的所有者
 #[utoipa::path(delete, path = "/api/v1/tools/{id}", tag = "tools")]
 async fn delete_tool_handler(
-    State(state): State<ToolAppState>,
+    State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<ApiResponse<()>>, AppError> {
-    let tool_id = Id::from_string(&id).map_err(|_| AppError::validation("无效的工具 ID"))?;
+    let tool_id = parse_id(&id, "无效的工具 ID")?;
 
     // TODO: 从认证中间件获取当前用户 ID
-    let requester_id = MemberId::new(); // 实际应该从 JWT Claims 中获取
+    let requester_id = MemberId::new();
 
     delete_tool(state.tool_repo.as_ref(), tool_id, requester_id).await?;
 
@@ -144,12 +144,11 @@ async fn delete_tool_handler(
 /// 列出指定所有者的工具
 #[utoipa::path(get, path = "/api/v1/tools/owner/{owner_id}", tag = "tools")]
 async fn list_tools_by_owner_handler(
-    State(state): State<ToolAppState>,
+    State(state): State<AppState>,
     Path(owner_id): Path<String>,
     Query(pagination): Query<PaginationQuery>,
 ) -> Result<Json<ApiResponse<PaginatedResponse<ToolDto>>>, AppError> {
-    let owner_id =
-        Id::from_string(&owner_id).map_err(|_| AppError::validation("无效的所有者 ID"))?;
+    let owner_id = parse_id(&owner_id, "无效的所有者 ID")?;
 
     let tools = list_tools_by_owner(
         state.tool_repo.as_ref(),
@@ -165,4 +164,9 @@ async fn list_tools_by_owner_handler(
     let response = PaginatedResponse::new(dtos, total, pagination.page, pagination.page_size);
 
     Ok(Json(ApiResponse::success(response)))
+}
+
+// 辅助函数：ID 解析
+fn parse_id<T>(id_str: &str, error_msg: &str) -> Result<shared::Id<T>, AppError> {
+    Id::from_string(id_str).map_err(|_| AppError::validation(error_msg))
 }

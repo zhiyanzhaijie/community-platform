@@ -5,6 +5,6 @@ pub mod persistence;
 pub mod security;
 pub mod tracing_setup;
 
-pub use persistence::postgres::{create_pool, PgPool, PostgresMemberRepository};
+pub use persistence::postgres::{create_pool, PgPool, PostgresMemberRepository, PostgresToolRepository};
 pub use security::{Argon2PasswordHasher, PasswordHasher};
 pub use tracing_setup::init_tracing;

@@ -1,6 +1,6 @@
 //! 会员注册用例
 
-use domain::member::{Email, Member, MemberRepository, Username};
+use domain::member::{Email, Member, MemberRepository, Password, Username};
 use shared::{AppError, Result};
 use tracing::instrument;
 
@@ -27,14 +27,10 @@ pub async fn register_member(
 ) -> Result<Member> {
     tracing::info!("开始注册会员");
 
-    // 验证密码强度
-    if input.password.len() < 8 {
-        return Err(AppError::validation("密码长度至少8位"));
-    }
-
-    // 构建值对象
+    // 构建值对象（Password 会自动验证强度）
     let email = Email::new(input.email)?;
     let username = Username::new(input.username)?;
+    let password = Password::new(input.password)?;
 
     // 检查邮箱是否已存在
     if repo.find_by_email(&email).await?.is_some() {
@@ -47,7 +43,7 @@ pub async fn register_member(
     }
 
     // 哈希密码
-    let password_hash = hasher.hash(&input.password)?;
+    let password_hash = hasher.hash(password.value())?;
 
     // 创建会员
     let member = Member::new(email, username, password_hash);
