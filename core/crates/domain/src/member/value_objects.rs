@@ -109,3 +109,41 @@ impl std::str::FromStr for MemberStatus {
         }
     }
 }
+
+/// 用户角色
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(rename_all = "lowercase")]
+pub enum UserRole {
+    Regular,  // 普通用户
+    Decider,  // 决策者
+    Admin,    // 管理员
+}
+
+impl Default for UserRole {
+    fn default() -> Self {
+        Self::Regular
+    }
+}
+
+impl std::fmt::Display for UserRole {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Regular => write!(f, "regular"),
+            Self::Decider => write!(f, "decider"),
+            Self::Admin => write!(f, "admin"),
+        }
+    }
+}
+
+impl std::str::FromStr for UserRole {
+    type Err = AppError;
+
+    fn from_str(s: &str) -> Result<Self> {
+        match s {
+            "regular" => Ok(Self::Regular),
+            "decider" => Ok(Self::Decider),
+            "admin" => Ok(Self::Admin),
+            _ => Err(AppError::validation(format!("无效的用户角色: {}", s))),
+        }
+    }
+}

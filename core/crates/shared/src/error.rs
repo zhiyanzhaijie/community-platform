@@ -43,6 +43,11 @@ impl AppError {
     pub fn validation(msg: impl Into<String>) -> Self {
         Self::Validation(msg.into())
     }
+
+    pub fn forbidden(msg: impl Into<String>) -> Self {
+        let _ = msg.into(); // 接受消息但使用默认的
+        Self::Forbidden
+    }
 }
 
 // 错误响应结构

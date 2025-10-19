@@ -41,6 +41,7 @@ chrono = { version = "0.4", features = ["serde"] }
 thiserror = "1.0"
 anyhow = "1.0"
 async-trait = "0.1"
+rust_decimal = { version = "1.33", features = ["serde"] }
 
 # ⚙️ 配置管理
 config = "0.14"

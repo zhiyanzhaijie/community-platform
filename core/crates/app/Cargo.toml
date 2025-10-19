@@ -14,3 +14,10 @@ tokio = { workspace = true }
 
 # 日志
 tracing = { workspace = true }
+
+# 数值计算
+rust_decimal = { workspace = true }
+
+# UUID生成
+uuid = { workspace = true }
+chrono = { workspace = true }
