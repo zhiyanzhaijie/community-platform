@@ -1,0 +1,14 @@
+[server]
+host = "127.0.0.1"
+port = 3000
+
+[database]
+url = "postgres://postgres:postgres_local_2024@localhost:5432/community_platform_local"
+max_connections = 5
+
+[log]
+level = "debug"
+format = "pretty"
+
+[jwt]
+secret = "local-secret-key-not-for-production"

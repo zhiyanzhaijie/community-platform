@@ -3,7 +3,7 @@ host = "127.0.0.1"
 port = 3000
 
 [database]
-url = "postgres://postgres:postgres@localhost:5432/community_platform_dev"
+url = "postgres://postgres:postgres_dev_2024@localhost:5432/community_platform_dev"
 max_connections = 5
 
 [log]

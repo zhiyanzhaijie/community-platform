@@ -50,7 +50,7 @@ impl AppConfig {
     /// 加载配置
     pub fn load() -> Result<Self, ConfigError> {
         dotenvy::dotenv().ok();
-        let run_env = env::var("RUN_ENV").unwrap_or_else(|_| "development".into());
+        let run_env = env::var("RUN_ENV").unwrap_or_else(|_| "local".into());
 
         let config = Config::builder()
             .add_source(File::with_name("config/default"))
