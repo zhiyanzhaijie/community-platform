@@ -42,5 +42,19 @@ Thumbs.db
 *.so
 *.dylib
 
+# Dioxus/Web
+# Web assembly artifacts
+*.wasm
+wasm-pack.log
+
+# Dioxus build output
+ui/packages/*/dist/
+ui/packages/*/public/
+
+# Node modules (if using npm/yarn for tooling)
+node_modules/
+package-lock.json
+yarn.lock
+
 # AI
 WARP.md
