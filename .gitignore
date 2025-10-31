@@ -51,6 +51,10 @@ wasm-pack.log
 ui/packages/*/dist/
 ui/packages/*/public/
 
+
+# UI specific (migrated from ui/.gitignore)
+ui/target
+
 # Node modules (if using npm/yarn for tooling)
 node_modules/
 package-lock.json
@@ -58,3 +62,4 @@ yarn.lock
 
 # AI
 WARP.md
+docs/*
