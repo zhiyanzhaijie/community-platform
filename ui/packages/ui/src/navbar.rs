@@ -1,15 +1,14 @@
 use dioxus::prelude::*;
 
-const NAVBAR_CSS: Asset = asset!("/assets/styling/navbar.css");
-
 #[component]
 pub fn Navbar(children: Element) -> Element {
     rsx! {
-        document::Link { rel: "stylesheet", href: NAVBAR_CSS }
-
-        div {
-            id: "navbar",
-            {children}
+        nav {
+            class: "bg-white shadow-md",
+            div {
+                class: "container mx-auto px-4 py-4 flex items-center gap-6",
+                {children}
+            }
         }
     }
 }

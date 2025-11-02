@@ -34,7 +34,7 @@ pub fn routes() -> Router<AppState> {
 /// 创建工具
 /// 
 /// TODO: 需要认证，从 JWT token 中获取 owner_id
-#[utoipa::path(post, path = "/api/v1/tools", tag = "tools")]
+#[cfg_attr(feature = "openapi", utoipa::path(post, path = "/api/v1/tools", tag = "tools"))]
 async fn create_tool_handler(
     State(state): State<AppState>,
     Json(req): Json<CreateToolRequest>,
@@ -59,7 +59,7 @@ async fn create_tool_handler(
 }
 
 /// 获取工具详情
-#[utoipa::path(get, path = "/api/v1/tools/{id}", tag = "tools")]
+#[cfg_attr(feature = "openapi", utoipa::path(get, path = "/api/v1/tools/{id}", tag = "tools"))]
 async fn get_tool_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -73,7 +73,7 @@ async fn get_tool_handler(
 }
 
 /// 列出可用工具（分页）
-#[utoipa::path(get, path = "/api/v1/tools", tag = "tools")]
+#[cfg_attr(feature = "openapi", utoipa::path(get, path = "/api/v1/tools", tag = "tools"))]
 async fn list_tools_handler(
     State(state): State<AppState>,
     Query(pagination): Query<PaginationQuery>,
@@ -96,7 +96,7 @@ async fn list_tools_handler(
 /// 更新工具
 /// 
 /// TODO: 需要认证，验证当前用户是工具的所有者
-#[utoipa::path(put, path = "/api/v1/tools/{id}", tag = "tools")]
+#[cfg_attr(feature = "openapi", utoipa::path(put, path = "/api/v1/tools/{id}", tag = "tools"))]
 async fn update_tool_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -126,7 +126,7 @@ async fn update_tool_handler(
 /// 删除工具
 /// 
 /// TODO: 需要认证，验证当前用户是工具的所有者
-#[utoipa::path(delete, path = "/api/v1/tools/{id}", tag = "tools")]
+#[cfg_attr(feature = "openapi", utoipa::path(delete, path = "/api/v1/tools/{id}", tag = "tools"))]
 async fn delete_tool_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
@@ -142,7 +142,7 @@ async fn delete_tool_handler(
 }
 
 /// 列出指定所有者的工具
-#[utoipa::path(get, path = "/api/v1/tools/owner/{owner_id}", tag = "tools")]
+#[cfg_attr(feature = "openapi", utoipa::path(get, path = "/api/v1/tools/owner/{owner_id}", tag = "tools"))]
 async fn list_tools_by_owner_handler(
     State(state): State<AppState>,
     Path(owner_id): Path<String>,

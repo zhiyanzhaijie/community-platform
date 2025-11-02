@@ -2,10 +2,12 @@
 
 use domain::tool::{Currency, Money, Tool};
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "openapi")]
 use utoipa::ToSchema;
 
 /// 创建工具请求
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct CreateToolRequest {
     pub name: String,
     pub description: Option<String>,
@@ -20,7 +22,8 @@ fn default_currency() -> String {
 }
 
 /// 更新工具请求
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct UpdateToolRequest {
     pub name: Option<String>,
     pub description: Option<String>,
@@ -30,7 +33,8 @@ pub struct UpdateToolRequest {
 }
 
 /// 工具 DTO
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct ToolDto {
     pub id: String,
     pub owner_id: String,
@@ -44,7 +48,8 @@ pub struct ToolDto {
 }
 
 /// 金额 DTO
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct MoneyDto {
     pub amount: i64,
     pub currency: String,
@@ -82,7 +87,8 @@ impl From<&Money> for MoneyDto {
 }
 
 /// 工具列表响应
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct ToolListResponse {
     pub tools: Vec<ToolDto>,
     pub total: i64,

@@ -1,7 +1,7 @@
 use dioxus::prelude::*;
 
 use ui::Navbar;
-use views::{Blog, Home};
+use views::{Login, Register, ToolList, ToolDetail, CreateTool, EditTool};
 
 mod views;
 
@@ -9,14 +9,22 @@ mod views;
 #[rustfmt::skip]
 enum Route {
     #[layout(WebNavbar)]
-    #[route("/")]
-    Home {},
-    #[route("/blog/:id")]
-    Blog { id: i32 },
+        #[route("/")]
+        Home {},
+        #[route("/tools/new")]
+        CreateTool {},
+        #[route("/tools/:id/edit")]
+        EditTool { id: String },
+        #[route("/tools/:id")]
+        ToolDetail { id: String },
+    #[end_layout]
+    #[route("/login")]
+    Login {},
+    #[route("/register")]
+    Register {},
 }
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
-const MAIN_CSS: Asset = asset!("/assets/main.css");
 
 fn main() {
     dioxus::launch(App);
@@ -24,33 +32,49 @@ fn main() {
 
 #[component]
 fn App() -> Element {
-    // Build cool things ✌️
-
     rsx! {
-        // Global app resources
         document::Link { rel: "icon", href: FAVICON }
-        document::Link { rel: "stylesheet", href: MAIN_CSS }
-
+        document::Style { 
+            r#"
+            * {{ margin: 0; padding: 0; box-sizing: border-box; }}
+            body {{ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif; }}
+            "#
+        }
         Router::<Route> {}
     }
 }
 
-/// A web-specific Router around the shared `Navbar` component
-/// which allows us to use the web-specific `Route` enum.
+#[component]
+fn Home() -> Element {
+    rsx! { ToolList {} }
+}
+
 #[component]
 fn WebNavbar() -> Element {
     rsx! {
         Navbar {
             Link {
                 to: Route::Home {},
-                "Home"
+                class: "text-gray-700 hover:text-blue-600 font-medium",
+                "工具市场"
             }
             Link {
-                to: Route::Blog { id: 1 },
-                "Blog"
+                to: Route::CreateTool {},
+                class: "px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 font-medium",
+                "发布工具"
+            }
+            div { class: "ml-auto flex gap-4" }
+            Link {
+                to: Route::Login {},
+                class: "text-gray-700 hover:text-blue-600 font-medium",
+                "登录"
+            }
+            Link {
+                to: Route::Register {},
+                class: "px-4 py-2 bg-gray-100 text-gray-700 rounded-md hover:bg-gray-200 font-medium",
+                "注册"
             }
         }
-
         Outlet::<Route> {}
     }
 }

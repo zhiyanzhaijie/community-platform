@@ -2,10 +2,12 @@
 
 use domain::member::Member;
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "openapi")]
 use utoipa::ToSchema;
 
 /// 注册请求
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct RegisterRequest {
     pub email: String,
     pub username: String,
@@ -13,21 +15,24 @@ pub struct RegisterRequest {
 }
 
 /// 登录请求
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
 }
 
 /// 登录响应
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct LoginResponse {
     pub token: String,
     pub member: MemberDto,
 }
 
 /// 会员 DTO
-#[derive(Debug, Serialize, ToSchema)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct MemberDto {
     pub id: String,
     pub email: String,

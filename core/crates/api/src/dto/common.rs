@@ -1,10 +1,11 @@
 //! 通用 DTO
 
 use serde::{Deserialize, Serialize};
+#[cfg(feature = "openapi")]
 use utoipa::ToSchema;
 
 /// API 响应
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct ApiResponse<T> {
     pub success: bool,
     pub data: Option<T>,
@@ -30,7 +31,8 @@ impl<T> ApiResponse<T> {
 }
 
 /// 分页请求
-#[derive(Debug, Deserialize, ToSchema)]
+#[derive(Debug, Clone, Deserialize, Serialize)]
+#[cfg_attr(feature = "openapi", derive(ToSchema))]
 pub struct PaginationQuery {
     #[serde(default = "default_page")]
     pub page: i64,
@@ -47,7 +49,7 @@ fn default_page_size() -> i64 {
 }
 
 /// 分页响应
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct PaginatedResponse<T> {
     pub items: Vec<T>,
     pub total: i64,
