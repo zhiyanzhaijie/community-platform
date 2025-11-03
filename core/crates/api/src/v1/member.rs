@@ -21,7 +21,7 @@ pub fn routes() -> Router<AppState> {
 }
 
 /// 注册
-#[cfg_attr(feature = "openapi", utoipa::path(post, path = "/api/v1/members/register", tag = "members"))]
+#[utoipa::path(post, path = "/api/v1/members/register", tag = "members")]
 async fn register(
     State(state): State<AppState>,
     Json(req): Json<RegisterRequest>,
@@ -43,7 +43,7 @@ async fn register(
 }
 
 /// 登录
-#[cfg_attr(feature = "openapi", utoipa::path(post, path = "/api/v1/members/login", tag = "members"))]
+#[utoipa::path(post, path = "/api/v1/members/login", tag = "members")]
 async fn login(
     State(state): State<AppState>,
     Json(req): Json<LoginRequest>,

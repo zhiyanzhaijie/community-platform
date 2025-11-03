@@ -1,7 +1,7 @@
 //! 通用 DTO
 
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "openapi")]
+#[cfg(feature = "http-server")]
 use utoipa::ToSchema;
 
 /// API 响应
@@ -32,7 +32,7 @@ impl<T> ApiResponse<T> {
 
 /// 分页请求
 #[derive(Debug, Clone, Deserialize, Serialize)]
-#[cfg_attr(feature = "openapi", derive(ToSchema))]
+#[cfg_attr(feature = "http-server", derive(ToSchema))]
 pub struct PaginationQuery {
     #[serde(default = "default_page")]
     pub page: i64,

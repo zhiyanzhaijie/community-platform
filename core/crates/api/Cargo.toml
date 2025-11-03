@@ -4,46 +4,75 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-# 依赖所有层
+# 核心依赖 - DTO 层始终需要
 domain = { path = "../domain" }
-app = { path = "../app" }
-infra = { path = "../infra" }
-shared = { path = "../shared" }
-
-# Web 框架
-axum = { workspace = true }
-tower = { workspace = true }
-tower-http = { workspace = true }
-
-# 异步运行时
-tokio = { workspace = true }
-
-# 日志
-tracing = { workspace = true }
-tracing-subscriber = { workspace = true }
-
-# 序列化
 serde = { workspace = true }
-serde_json = { workspace = true }
 chrono = { workspace = true }
 
-# 安全
-argon2 = { workspace = true }
-jsonwebtoken = { workspace = true }
+# HTTP 服务器依赖 - 仅在 http-server feature 下需要
+app = { path = "../app", optional = true }
+infra = { path = "../infra", optional = true }
+shared = { path = "../shared", optional = true }
 
-# 数据验证
-validator = { workspace = true }
+# Web 框架 - 仅在 http-server feature 下需要
+axum = { workspace = true, optional = true }
+tower = { workspace = true, optional = true }
+tower-http = { workspace = true, optional = true }
 
-# 配置
-dotenvy = { workspace = true }
+# 异步运行时 - 仅在 http-server feature 下需要
+tokio = { workspace = true, optional = true }
 
-# 错误处理
-anyhow = { workspace = true }
+# 日志 - 仅在 http-server feature 下需要
+tracing = { workspace = true, optional = true }
+tracing-subscriber = { workspace = true, optional = true }
+
+# 序列化
+serde_json = { workspace = true, optional = true }
+
+# 安全 - 仅在 http-server feature 下需要
+argon2 = { workspace = true, optional = true }
+jsonwebtoken = { workspace = true, optional = true }
+
+# 数据验证 - 仅在 http-server feature 下需要
+validator = { workspace = true, optional = true }
+
+# 配置 - 仅在 http-server feature 下需要
+dotenvy = { workspace = true, optional = true }
+
+# 错误处理 - 仅在 http-server feature 下需要
+anyhow = { workspace = true, optional = true }
 
 # API 文档（可选）
 utoipa = { workspace = true, optional = true }
 utoipa-swagger-ui = { workspace = true, optional = true }
 
 [features]
-default = ["openapi"]
-openapi = ["dep:utoipa", "dep:utoipa-swagger-ui"]
+default = []
+# HTTP 服务器完整功能 (包含 OpenAPI 文档)
+http-server = [
+    "dep:app",
+    "dep:infra",
+    "dep:shared",
+    "dep:axum",
+    "dep:tower",
+    "dep:tower-http",
+    "dep:tokio",
+    "dep:tracing",
+    "dep:tracing-subscriber",
+    "dep:serde_json",
+    "dep:argon2",
+    "dep:jsonwebtoken",
+    "dep:validator",
+    "dep:dotenvy",
+    "dep:anyhow",
+    "dep:utoipa",
+    "dep:utoipa-swagger-ui",
+]
+# openapi 现在只是 http-server 的别名
+openapi = ["http-server"]
+
+# 为了支持 binary target
+[[bin]]
+name = "api"
+path = "src/main.rs"
+required-features = ["http-server"]

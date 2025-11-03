@@ -1,18 +1,17 @@
 //! OpenAPI 文档定义
+//!
+//! 注: 这个模块只在 http-server feature 下编译
 
-#[cfg(feature = "openapi")]
 use utoipa::OpenApi;
 
-#[cfg(feature = "openapi")]
 use crate::dto::{
     common::PaginationQuery,
     member::{LoginRequest, LoginResponse, MemberDto, RegisterRequest},
 };
 
 /// OpenAPI 文档结构
-#[cfg(feature = "openapi")]
 #[derive(OpenApi)]
-#[cfg_attr(feature = "openapi", openapi(
+#[openapi(
     info(
         title = "Community Trading Platform API",
         version = "1.0.0",
@@ -34,5 +33,5 @@ use crate::dto::{
     tags(
         (name = "members", description = "会员管理"),
     )
-))]
+)]
 pub struct ApiDoc;
