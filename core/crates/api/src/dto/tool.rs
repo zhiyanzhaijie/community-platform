@@ -1,13 +1,10 @@
-//! 工具 DTO
+//! Tool DTOs
 
 use domain::tool::{Currency, Money, Tool};
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "http-server")]
 use utoipa::ToSchema;
 
-/// 创建工具请求
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct CreateToolRequest {
     pub name: String,
     pub description: Option<String>,
@@ -21,9 +18,7 @@ fn default_currency() -> String {
     "CNY".to_string()
 }
 
-/// 更新工具请求
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct UpdateToolRequest {
     pub name: Option<String>,
     pub description: Option<String>,
@@ -32,9 +27,7 @@ pub struct UpdateToolRequest {
     pub price_currency: Option<String>,
 }
 
-/// 工具 DTO
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ToolDto {
     pub id: String,
     pub owner_id: String,
@@ -47,15 +40,12 @@ pub struct ToolDto {
     pub updated_at: String,
 }
 
-/// 金额 DTO
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct MoneyDto {
     pub amount: i64,
     pub currency: String,
 }
 
-/// Tool -> ToolDto 转换
 impl From<&Tool> for ToolDto {
     fn from(tool: &Tool) -> Self {
         Self {
@@ -72,7 +62,6 @@ impl From<&Tool> for ToolDto {
     }
 }
 
-/// Money -> MoneyDto 转换
 impl From<&Money> for MoneyDto {
     fn from(money: &Money) -> Self {
         let currency = match money.currency {
@@ -86,9 +75,7 @@ impl From<&Money> for MoneyDto {
     }
 }
 
-/// 工具列表响应
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ToolListResponse {
     pub tools: Vec<ToolDto>,
     pub total: i64,

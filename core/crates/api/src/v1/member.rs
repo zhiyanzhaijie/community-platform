@@ -13,14 +13,12 @@ use crate::{
 use app::member::{login_member, register_member, LoginInput, RegisterInput};
 use shared::AppError;
 
-/// 会员路由
 pub fn routes() -> Router<AppState> {
     Router::new()
         .route("/register", post(register))
         .route("/login", post(login))
 }
 
-/// 注册
 #[utoipa::path(post, path = "/api/v1/members/register", tag = "members")]
 async fn register(
     State(state): State<AppState>,
@@ -42,7 +40,6 @@ async fn register(
     Ok(Json(ApiResponse::success(dto)))
 }
 
-/// 登录
 #[utoipa::path(post, path = "/api/v1/members/login", tag = "members")]
 async fn login(
     State(state): State<AppState>,

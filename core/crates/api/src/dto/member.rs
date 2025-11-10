@@ -1,38 +1,29 @@
-//! 会员 DTO
+//! Member DTOs
 
 use domain::member::Member;
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "http-server")]
 use utoipa::ToSchema;
 
-/// 注册请求
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct RegisterRequest {
     pub email: String,
     pub username: String,
     pub password: String,
 }
 
-/// 登录请求
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
 }
 
-/// 登录响应
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct LoginResponse {
     pub token: String,
     pub member: MemberDto,
 }
 
-/// 会员 DTO
-#[derive(Debug, Clone, Serialize, Deserialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct MemberDto {
     pub id: String,
     pub email: String,
@@ -41,7 +32,6 @@ pub struct MemberDto {
     pub created_at: String,
 }
 
-/// Member -> MemberDto 转换
 impl From<&Member> for MemberDto {
     fn from(member: &Member) -> Self {
         Self {
