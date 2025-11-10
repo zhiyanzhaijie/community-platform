@@ -1,6 +1,4 @@
-//! OpenAPI 文档定义
-//!
-//! 注: 这个模块只在 http-server feature 下编译
+//! OpenAPI documentation
 
 use utoipa::OpenApi;
 

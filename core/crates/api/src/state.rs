@@ -5,7 +5,6 @@ use std::sync::Arc;
 use domain::{member::MemberRepository, tool::ToolRepository};
 use shared::AppConfig;
 
-/// 全局应用状态
 #[derive(Clone)]
 pub struct AppState {
     pub member_repo: Arc<dyn MemberRepository>,
@@ -15,7 +14,6 @@ pub struct AppState {
 }
 
 impl AppState {
-    /// 创建新的应用状态
     pub fn new(
         member_repo: Arc<dyn MemberRepository>,
         tool_repo: Arc<dyn ToolRepository>,

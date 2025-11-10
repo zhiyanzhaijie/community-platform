@@ -10,14 +10,12 @@ use jsonwebtoken::{decode, encode, DecodingKey, EncodingKey, Header, Validation}
 use serde::{Deserialize, Serialize};
 use shared::AppError;
 
-/// JWT Claims
 #[derive(Debug, Serialize, Deserialize)]
 pub struct Claims {
-    pub sub: String,  // subject (user id)
-    pub exp: usize,   // expiration time
+    pub sub: String,
+    pub exp: usize,
 }
 
-/// 生成 JWT token
 pub fn generate_token(user_id: &str, secret: &str, expires_in: i64) -> Result<String, AppError> {
     let expiration = chrono::Utc::now()
         .checked_add_signed(chrono::Duration::seconds(expires_in))
@@ -37,7 +35,6 @@ pub fn generate_token(user_id: &str, secret: &str, expires_in: i64) -> Result<St
     .map_err(|e| AppError::internal(format!("token 生成失败: {}", e)))
 }
 
-/// 验证 JWT token
 pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
     decode::<Claims>(
         token,
@@ -48,12 +45,9 @@ pub fn verify_token(token: &str, secret: &str) -> Result<Claims, AppError> {
     .map_err(|_| AppError::Unauthorized)
 }
 
-/// JWT 认证中间件
 pub async fn auth_middleware(
-    // TODO: 从请求中提取 token 并验证
     request: Request,
     next: Next,
 ) -> Result<Response, StatusCode> {
-    // 简化实现，后续完善
     Ok(next.run(request).await)
 }
