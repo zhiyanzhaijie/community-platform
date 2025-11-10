@@ -1,6 +1,6 @@
 //! 路由配置
 
-use axum::{http::StatusCode, response::Json, routing::get, Router};
+use axum::{http::StatusCode, middleware, response::Json, routing::get, Router};
 use serde_json::{json, Value};
 use shared::constants::API_VERSION_V1;
 use utoipa::OpenApi;
@@ -8,6 +8,9 @@ use utoipa_swagger_ui::SwaggerUi;
 
 use crate::AppState;
 use crate::openapi::ApiDoc;
+use crate::middleware::auth::{auth_middleware_with_secret, Claims};
+use axum::extract::Request;
+use tower::Layer;
 
 pub fn app_routes(state: AppState) -> Router {
     let router = Router::new()
@@ -20,9 +23,17 @@ pub fn app_routes(state: AppState) -> Router {
 }
 
 fn v1_routes(state: AppState) -> Router {
+    let secret = state.config.jwt.secret.clone();
+    
     Router::new()
         .nest("/members", crate::v1::member::routes())
-        .nest("/tools", crate::v1::tool::routes())
+        .nest(
+            "/tools",
+            crate::v1::tool::routes()
+                .layer(middleware::from_fn(move |req: Request, next| {
+                    auth_middleware_with_secret(req, next, secret.clone())
+                })),
+        )
         .with_state(state)
 }
 

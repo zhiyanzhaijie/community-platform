@@ -11,13 +11,13 @@ use crate::{
         common::{ApiResponse, PaginatedResponse, PaginationQuery},
         tool::{CreateToolRequest, ToolDto, UpdateToolRequest},
     },
+    middleware::auth::CurrentUser,
     AppState,
 };
 use app::tool::{
     count_tools, create_tool, delete_tool, get_tool, list_available_tools,
     list_tools_by_owner, update_tool, CreateToolInput, UpdateToolInput,
 };
-use domain::member::MemberId;
 use shared::{AppError, Id};
 
 pub fn routes() -> Router<AppState> {
@@ -30,12 +30,19 @@ pub fn routes() -> Router<AppState> {
         .route("/owner/:owner_id", get(list_tools_by_owner_handler))
 }
 
-#[utoipa::path(post, path = "/api/v1/tools", tag = "tools")]
-async fn create_tool_handler(
+#[utoipa::path(
+    post,
+    path = "/api/v1/tools",
+    tag = "tools",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn create_tool_handler(
     State(state): State<AppState>,
+    CurrentUser(owner_id): CurrentUser,
     Json(req): Json<CreateToolRequest>,
 ) -> Result<Json<ApiResponse<ToolDto>>, AppError> {
-    let owner_id = MemberId::new();
 
     let input = CreateToolInput {
         owner_id,
@@ -52,8 +59,15 @@ async fn create_tool_handler(
     Ok(Json(ApiResponse::success(dto)))
 }
 
-#[utoipa::path(get, path = "/api/v1/tools/{id}", tag = "tools")]
-async fn get_tool_handler(
+#[utoipa::path(
+    get,
+    path = "/api/v1/tools/{id}",
+    tag = "tools",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn get_tool_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
 ) -> Result<Json<ApiResponse<ToolDto>>, AppError> {
@@ -65,8 +79,15 @@ async fn get_tool_handler(
     Ok(Json(ApiResponse::success(dto)))
 }
 
-#[utoipa::path(get, path = "/api/v1/tools", tag = "tools")]
-async fn list_tools_handler(
+#[utoipa::path(
+    get,
+    path = "/api/v1/tools",
+    tag = "tools",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn list_tools_handler(
     State(state): State<AppState>,
     Query(pagination): Query<PaginationQuery>,
 ) -> Result<Json<ApiResponse<PaginatedResponse<ToolDto>>>, AppError> {
@@ -85,15 +106,21 @@ async fn list_tools_handler(
     Ok(Json(ApiResponse::success(response)))
 }
 
-#[utoipa::path(put, path = "/api/v1/tools/{id}", tag = "tools")]
-async fn update_tool_handler(
+#[utoipa::path(
+    put,
+    path = "/api/v1/tools/{id}",
+    tag = "tools",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn update_tool_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    CurrentUser(requester_id): CurrentUser,
     Json(req): Json<UpdateToolRequest>,
 ) -> Result<Json<ApiResponse<ToolDto>>, AppError> {
     let tool_id = parse_id(&id, "无效的工具 ID")?;
-
-    let requester_id = MemberId::new();
 
     let input = UpdateToolInput {
         tool_id,
@@ -111,22 +138,35 @@ async fn update_tool_handler(
     Ok(Json(ApiResponse::success(dto)))
 }
 
-#[utoipa::path(delete, path = "/api/v1/tools/{id}", tag = "tools")]
-async fn delete_tool_handler(
+#[utoipa::path(
+    delete,
+    path = "/api/v1/tools/{id}",
+    tag = "tools",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn delete_tool_handler(
     State(state): State<AppState>,
     Path(id): Path<String>,
+    CurrentUser(requester_id): CurrentUser,
 ) -> Result<Json<ApiResponse<()>>, AppError> {
     let tool_id = parse_id(&id, "无效的工具 ID")?;
-
-    let requester_id = MemberId::new();
 
     delete_tool(state.tool_repo.as_ref(), tool_id, requester_id).await?;
 
     Ok(Json(ApiResponse::success(())))
 }
 
-#[utoipa::path(get, path = "/api/v1/tools/owner/{owner_id}", tag = "tools")]
-async fn list_tools_by_owner_handler(
+#[utoipa::path(
+    get,
+    path = "/api/v1/tools/owner/{owner_id}",
+    tag = "tools",
+    security(
+        ("bearer_auth" = [])
+    )
+)]
+pub async fn list_tools_by_owner_handler(
     State(state): State<AppState>,
     Path(owner_id): Path<String>,
     Query(pagination): Query<PaginationQuery>,
