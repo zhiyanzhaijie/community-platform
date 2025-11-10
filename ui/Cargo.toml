@@ -1,11 +1,11 @@
 [workspace]
 resolver = "2"
 members = [
-    "packages/ui",
-    "packages/web",
-    "packages/desktop",
-    "packages/mobile",
-    "packages/io",
+  "packages/ui",
+  "packages/web",
+  # "packages/desktop",
+  # "packages/mobile",
+  "packages/io",
 ]
 
 [workspace.dependencies]
