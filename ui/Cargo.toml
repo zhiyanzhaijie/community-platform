@@ -5,12 +5,12 @@ members = [
   "packages/web",
   # "packages/desktop",
   # "packages/mobile",
-  "packages/io",
+  # "packages/io",
 ]
 
 [workspace.dependencies]
-dioxus = { version = "0.7.0" }
+dioxus = { version = "0.7.1" }
 
 # workspace
 ui = { path = "packages/ui" }
-io = { path = "packages/io" }
+# io = { path = "packages/io" }
