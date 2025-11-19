@@ -5,25 +5,25 @@ use utoipa::ToSchema;
 
 #[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ApiResponse<T> {
-    pub success: bool,
+    pub code: u16,
     pub data: Option<T>,
-    pub error: Option<String>,
+    pub message: Option<String>,
 }
 
 impl<T> ApiResponse<T> {
     pub fn success(data: T) -> Self {
         Self {
-            success: true,
+            code: 200,
             data: Some(data),
-            error: None,
+            message: None,
         }
     }
 
-    pub fn error(message: String) -> Self {
+    pub fn error(code: u16, message: String) -> Self {
         Self {
-            success: false,
+            code,
             data: None,
-            error: Some(message),
+            message: Some(message),
         }
     }
 }
