@@ -7,8 +7,11 @@ edition = "2021"
 dioxus = { workspace = true, features = ["router", "fullstack"] }
 dioxus-primitives = { git = "https://github.com/DioxusLabs/components", version = "0.0.1", default-features = false }
 ui = { workspace = true }
+reqwest = { version = "0.12", features = ["json"], optional = true }
+serde = { version = "1.0", features = ["derive"] }
+dioxus-fullstack = { workspace = true, optional = true }
 
 [features]
 default = []
 web = ["dioxus/web"]
-server = ["dioxus/server"]
+server = ["dioxus/server", "dep:reqwest", "dep:dioxus-fullstack"]
