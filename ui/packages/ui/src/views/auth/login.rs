@@ -1,8 +1,8 @@
-use dioxus::prelude::*;
 use crate::components::button::{Button, ButtonVariant};
-use crate::Route;
-use crate::types::LoginRequest;
 use crate::io::auth::login;
+use crate::types::LoginRequest;
+use crate::Route;
+use dioxus::prelude::*;
 
 #[component]
 pub fn Login() -> Element {
@@ -14,25 +14,25 @@ pub fn Login() -> Element {
     let handle_submit = move |e: Event<FormData>| async move {
         e.prevent_default();
         error_msg.set(None);
-        
+
         let req = LoginRequest {
             email: email(),
             password: password(),
         };
-        
+
         match login(req).await {
             Ok(resp) => {
                 // Set Cookie on Client Side via JS eval
                 // This allows subsequent SSR requests to carry the token
                 let js = format!(
-                    "document.cookie = 'token={}; Path=/; SameSite=Lax; Max-Age=86400';", 
+                    "document.cookie = 'token={}; Path=/; SameSite=Lax; Max-Age=86400';",
                     resp.token
                 );
                 // Dioxus 0.7 document::eval
                 let _ = document::eval(&js);
-                
+
                 nav.push(Route::ToolList {});
-            },
+            }
             Err(e) => {
                 error_msg.set(Some(e.to_string()));
             }
@@ -59,7 +59,7 @@ pub fn Login() -> Element {
                         }
                     }
                 }
-                
+
                 if let Some(msg) = error_msg() {
                     div {
                         class: "bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded relative",

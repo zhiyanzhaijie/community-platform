@@ -13,5 +13,5 @@ dioxus-fullstack = { workspace = true, optional = true }
 
 [features]
 default = []
-web = ["dioxus/web"]
-server = ["dioxus/server", "dep:reqwest", "dep:dioxus-fullstack"]
+web = ["dioxus/web", "ui/web"]
+server = ["dioxus/server", "dep:reqwest", "dep:dioxus-fullstack", "ui/server"]

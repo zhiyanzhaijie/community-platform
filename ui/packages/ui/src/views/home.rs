@@ -1,7 +1,7 @@
-use dioxus::prelude::*;
-use crate::components::tabs::{Tabs, TabList, TabTrigger, TabContent};
 use crate::components::button::{Button, ButtonVariant};
+use crate::components::tabs::{TabContent, TabList, TabTrigger, Tabs};
 use crate::Route;
+use dioxus::prelude::*;
 
 #[component]
 pub fn Home() -> Element {
@@ -9,7 +9,7 @@ pub fn Home() -> Element {
         div {
             class: "space-y-6",
             h2 {
-                class: "text-3xl font-bold text-gray-900",
+                class: "text-4xl font-bold text-gray-900",
                 "Welcome to Dioxus Router Demo"
             }
             p {

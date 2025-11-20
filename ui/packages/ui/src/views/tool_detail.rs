@@ -1,7 +1,7 @@
-use dioxus::prelude::*;
-use crate::io::get_tool;
 use crate::components::button::{Button, ButtonVariant};
+use crate::io::get_tool;
 use crate::Route;
+use dioxus::prelude::*;
 
 #[component]
 pub fn ToolDetail(id: String) -> Element {
