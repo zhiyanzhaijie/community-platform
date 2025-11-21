@@ -1,4 +1,3 @@
-use crate::components::button::{Button, ButtonVariant};
 use crate::io::get_tool;
 use crate::Route;
 use dioxus::prelude::*;
@@ -58,9 +57,8 @@ pub fn ToolDetail(id: String) -> Element {
                 class: "mt-8 pt-8 border-t border-gray-200",
                 Link {
                     to: Route::ToolList {},
-                    Button {
-                        variant: ButtonVariant::Outline,
-                        "← Back to Tools"
+                    button {
+                        "back"
                     }
                 }
             }

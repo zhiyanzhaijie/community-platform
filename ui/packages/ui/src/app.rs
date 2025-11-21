@@ -1,10 +1,8 @@
-use crate::components::separator::Separator;
 use crate::views::{Home, Login, NotFound, Signup, ToolDetail, ToolList};
 use dioxus::prelude::*;
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const TAILWIND: Asset = asset!("/assets/tailwind.css");
-const DX_COMPONENTS_THEME: Asset = asset!("/assets/dx-components-theme.css");
 
 #[derive(Routable, Clone, PartialEq)]
 pub enum Route {
@@ -31,7 +29,6 @@ pub enum Route {
 pub fn App() -> Element {
     rsx! {
         document::Link { rel: "icon", href: FAVICON }
-        document::Stylesheet { href: DX_COMPONENTS_THEME }
         document::Stylesheet { href: TAILWIND }
         Router::<Route> {}
     }
@@ -62,7 +59,6 @@ fn Layout() -> Element {
                                     class: "text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium",
                                     "Home"
                                 }
-                                Separator { horizontal: false, class: "h-6" }
                                 Link {
                                     to: Route::ToolList {},
                                     class: "text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium",
