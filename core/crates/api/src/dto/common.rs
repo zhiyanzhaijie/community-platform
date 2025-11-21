@@ -1,38 +1,34 @@
-//! 通用 DTO
+//! Common DTOs
 
 use serde::{Deserialize, Serialize};
-#[cfg(feature = "http-server")]
 use utoipa::ToSchema;
 
-/// API 响应
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct ApiResponse<T> {
-    pub success: bool,
+    pub code: u16,
     pub data: Option<T>,
-    pub error: Option<String>,
+    pub message: Option<String>,
 }
 
 impl<T> ApiResponse<T> {
     pub fn success(data: T) -> Self {
         Self {
-            success: true,
+            code: 200,
             data: Some(data),
-            error: None,
+            message: None,
         }
     }
 
-    pub fn error(message: String) -> Self {
+    pub fn error(code: u16, message: String) -> Self {
         Self {
-            success: false,
+            code,
             data: None,
-            error: Some(message),
+            message: Some(message),
         }
     }
 }
 
-/// 分页请求
-#[derive(Debug, Clone, Deserialize, Serialize)]
-#[cfg_attr(feature = "http-server", derive(ToSchema))]
+#[derive(Debug, Clone, Deserialize, Serialize, ToSchema)]
 pub struct PaginationQuery {
     #[serde(default = "default_page")]
     pub page: i64,
@@ -48,8 +44,7 @@ fn default_page_size() -> i64 {
     20
 }
 
-/// 分页响应
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, ToSchema)]
 pub struct PaginatedResponse<T> {
     pub items: Vec<T>,
     pub total: i64,

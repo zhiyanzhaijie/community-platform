@@ -72,12 +72,8 @@ impl TryFrom<MemberRow> for Member {
 impl MemberRepository for PostgresMemberRepository {
     #[instrument(name = "save_member", skip(self, member))]
     async fn save(&self, member: &Member) -> Result<()> {
-        let managed_professions_json = if member.managed_professions.is_empty() {
-            None
-        } else {
-            Some(serde_json::to_value(&member.managed_professions)
-                .map_err(|e| AppError::internal(format!("序列化职业列表失败: {}", e)))?)
-        };
+        let managed_professions_json = serde_json::to_value(&member.managed_professions)
+            .map_err(|e| AppError::internal(format!("序列化职业列表失败: {}", e)))?;
 
         sqlx::query!(
             r#"
@@ -90,7 +86,7 @@ impl MemberRepository for PostgresMemberRepository {
             member.password_hash,
             member.status.to_string(),
             member.role.to_string(),
-            managed_professions_json,
+            managed_professions_json as serde_json::Value,
             member.created_at,
             member.updated_at
         )
@@ -145,12 +141,8 @@ impl MemberRepository for PostgresMemberRepository {
 
     #[instrument(name = "update_member", skip(self, member))]
     async fn update(&self, member: &Member) -> Result<()> {
-        let managed_professions_json = if member.managed_professions.is_empty() {
-            None
-        } else {
-            Some(serde_json::to_value(&member.managed_professions)
-                .map_err(|e| AppError::internal(format!("序列化职业列表失败: {}", e)))?)
-        };
+        let managed_professions_json = serde_json::to_value(&member.managed_professions)
+            .map_err(|e| AppError::internal(format!("序列化职业列表失败: {}", e)))?;
 
         sqlx::query!(
             r#"
@@ -164,7 +156,7 @@ impl MemberRepository for PostgresMemberRepository {
             member.password_hash,
             member.status.to_string(),
             member.role.to_string(),
-            managed_professions_json,
+            managed_professions_json as serde_json::Value,
             member.updated_at
         )
         .execute(&self.pool)
