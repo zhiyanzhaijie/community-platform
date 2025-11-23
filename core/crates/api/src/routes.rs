@@ -6,9 +6,9 @@ use shared::constants::API_VERSION_V1;
 use utoipa::OpenApi;
 use utoipa_swagger_ui::SwaggerUi;
 
-use crate::AppState;
-use crate::openapi::ApiDoc;
 use crate::middleware::auth::{auth_middleware_with_secret, Claims};
+use crate::openapi::ApiDoc;
+use crate::AppState;
 use axum::extract::Request;
 use tower::Layer;
 
@@ -18,22 +18,21 @@ pub fn app_routes(state: AppState) -> Router {
         .nest(API_VERSION_V1, v1_routes(state))
         .route("/health", get(health_check))
         .route("/ready", get(readiness_check));
-    
+
     router
 }
 
 fn v1_routes(state: AppState) -> Router {
     let secret = state.config.jwt.secret.clone();
-    
+
     Router::new()
         .nest("/members", crate::v1::member::routes())
-        .nest(
-            "/tools",
-            crate::v1::tool::routes()
-                .layer(middleware::from_fn(move |req: Request, next| {
-                    auth_middleware_with_secret(req, next, secret.clone())
-                })),
-        )
+        .nest("/knowledge", {
+            let secret = secret.clone();
+            crate::v1::knowledge::routes().layer(middleware::from_fn(move |req: Request, next| {
+                auth_middleware_with_secret(req, next, secret.clone())
+            }))
+        })
         .with_state(state)
 }
 

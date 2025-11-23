@@ -2,8 +2,8 @@ use std::sync::Arc;
 
 use api::AppState;
 use infra::{
-    create_pool, init_tracing, Argon2PasswordHasher, PasswordHasher, 
-    PostgresMemberRepository, PostgresToolRepository,
+    create_pool, init_tracing, Argon2PasswordHasher, PasswordHasher, PostgresKnowledgeRepository,
+    PostgresMemberRepository,
 };
 use shared::AppConfig;
 
@@ -30,13 +30,13 @@ async fn main() -> anyhow::Result<()> {
     // 初始化应用状态
     let member_repo: Arc<dyn domain::member::MemberRepository> =
         Arc::new(PostgresMemberRepository::new(pool.clone()));
-    let tool_repo: Arc<dyn domain::tool::ToolRepository> =
-        Arc::new(PostgresToolRepository::new(pool.clone()));
+    let knowledge_repo: Arc<dyn domain::knowledge::KnowledgeRepository> =
+        Arc::new(PostgresKnowledgeRepository::new(pool.clone()));
     let password_hasher: Arc<dyn PasswordHasher> = Arc::new(Argon2PasswordHasher::new());
-    
+
     let state = AppState {
         member_repo,
-        tool_repo,
+        knowledge_repo,
         password_hasher,
         config: Arc::new(config.clone()),
     };

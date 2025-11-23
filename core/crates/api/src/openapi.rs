@@ -1,12 +1,12 @@
 //! OpenAPI documentation
 
-use utoipa::{OpenApi, Modify};
-use utoipa::openapi::security::{SecurityScheme, HttpBuilder, HttpAuthScheme};
+use utoipa::openapi::security::{HttpAuthScheme, HttpBuilder, SecurityScheme};
+use utoipa::{Modify, OpenApi};
 
 use crate::dto::{
     common::{ApiResponse, PaginatedResponse, PaginationQuery},
+    knowledge::{CreateKnowledgeRequest, KnowledgeDto, UpdateKnowledgeRequest},
     member::{LoginRequest, LoginResponse, MemberDto, RegisterRequest},
-    tool::{CreateToolRequest, ToolDto, UpdateToolRequest},
 };
 
 /// OpenAPI 文档结构
@@ -20,33 +20,33 @@ use crate::dto::{
     paths(
         crate::v1::member::register,
         crate::v1::member::login,
-        crate::v1::tool::create_tool_handler,
-        crate::v1::tool::get_tool_handler,
-        crate::v1::tool::list_tools_handler,
-        crate::v1::tool::update_tool_handler,
-        crate::v1::tool::delete_tool_handler,
-        crate::v1::tool::list_tools_by_owner_handler,
+        crate::v1::knowledge::create_knowledge_handler,
+        crate::v1::knowledge::get_knowledge_handler,
+        crate::v1::knowledge::list_knowledge_handler,
+        crate::v1::knowledge::update_knowledge_handler,
+        crate::v1::knowledge::delete_knowledge_handler,
+        crate::v1::knowledge::list_knowledge_by_owner_handler,
     ),
     components(
         schemas(
             ApiResponse<MemberDto>,
             ApiResponse<LoginResponse>,
-            ApiResponse<ToolDto>,
-            ApiResponse<PaginatedResponse<ToolDto>>,
+            ApiResponse<KnowledgeDto>,
+            ApiResponse<PaginatedResponse<KnowledgeDto>>,
             PaginationQuery,
             RegisterRequest,
             LoginRequest,
             LoginResponse,
             MemberDto,
-            CreateToolRequest,
-            UpdateToolRequest,
-            ToolDto,
-            PaginatedResponse<ToolDto>,
+            CreateKnowledgeRequest,
+            UpdateKnowledgeRequest,
+            KnowledgeDto,
+            PaginatedResponse<KnowledgeDto>,
         )
     ),
     tags(
         (name = "members", description = "会员管理"),
-        (name = "tools", description = "工具管理"),
+        (name = "knowledge", description = "知识管理"),
     ),
     modifiers(&SecurityAddon)
 )]

@@ -2,13 +2,13 @@
 
 use std::sync::Arc;
 
-use domain::{member::MemberRepository, tool::ToolRepository};
+use domain::{knowledge::KnowledgeRepository, member::MemberRepository};
 use shared::AppConfig;
 
 #[derive(Clone)]
 pub struct AppState {
     pub member_repo: Arc<dyn MemberRepository>,
-    pub tool_repo: Arc<dyn ToolRepository>,
+    pub knowledge_repo: Arc<dyn KnowledgeRepository>,
     pub password_hasher: Arc<dyn infra::PasswordHasher>,
     pub config: Arc<AppConfig>,
 }
@@ -16,13 +16,13 @@ pub struct AppState {
 impl AppState {
     pub fn new(
         member_repo: Arc<dyn MemberRepository>,
-        tool_repo: Arc<dyn ToolRepository>,
+        knowledge_repo: Arc<dyn KnowledgeRepository>,
         password_hasher: Arc<dyn infra::PasswordHasher>,
         config: Arc<AppConfig>,
     ) -> Self {
         Self {
             member_repo,
-            tool_repo,
+            knowledge_repo,
             password_hasher,
             config,
         }

@@ -18,6 +18,9 @@ tracing = { workspace = true }
 # 数值计算
 rust_decimal = { workspace = true }
 
+# JSON 处理（知识内容使用 serde_json::Value）
+serde_json = { workspace = true }
+
 # UUID生成
 uuid = { workspace = true }
 chrono = { workspace = true }
