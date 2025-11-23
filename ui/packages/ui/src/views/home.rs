@@ -1,11 +1,9 @@
+use crate::components::button::{Button, ButtonVariant};
 use crate::Route;
 use dioxus::prelude::*;
-use lumen_blocks::components::button::{Button, ButtonVariant, ButtonSize};
-
 #[component]
 pub fn Home() -> Element {
     let nav = use_navigator();
-
     rsx! {
         div {
             class: "flex flex-col items-center justify-center py-20 text-center",
@@ -20,14 +18,19 @@ pub fn Home() -> Element {
             div {
                 class: "flex gap-4",
                 Button {
-                    size: ButtonSize::Large,
-                    on_click: move |_| { nav.push(Route::ToolList {}); },
+                    variant: ButtonVariant::Primary,
+                    class: "px-6 py-3 text-base",
+                    onclick: move |_| {
+                        nav.push(Route::ToolList {});
+                    },
                     "Browse Tools"
                 }
                 Button {
                     variant: ButtonVariant::Outline,
-                    size: ButtonSize::Large,
-                    on_click: move |_| { nav.push(Route::Login {}); },
+                    class: "px-6 py-3 text-base bg-background hover:bg-accent hover:text-accent-foreground",
+                    onclick: move |_| {
+                        nav.push(Route::Login {});
+                    },
                     "Get Started"
                 }
             }

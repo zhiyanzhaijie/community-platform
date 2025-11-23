@@ -1,6 +1,6 @@
+use crate::components::button::{Button, ButtonVariant};
 use crate::Route;
 use dioxus::prelude::*;
-use lumen_blocks::components::button::Button;
 
 #[component]
 pub fn NotFound(route: Vec<String>) -> Element {
@@ -19,7 +19,9 @@ pub fn NotFound(route: Vec<String>) -> Element {
                 "Page not found"
             }
             Button {
-                on_click: move |_| { nav.push(Route::Home {}); },
+                variant: ButtonVariant::Primary,
+                class: "px-4 py-2 text-sm font-medium",
+                onclick: move |_| { nav.push(Route::Home {}); },
                 "Go Home"
             }
         }

@@ -1,22 +1,22 @@
+use crate::components::{
+    button::{Button, ButtonVariant},
+    input::Input,
+    label::Label,
+};
 use crate::io::auth::register;
 use crate::types::RegisterRequest;
 use crate::Route;
 use dioxus::prelude::*;
-use lumen_blocks::components::input::Input;
-use lumen_blocks::components::label::Label;
-use lumen_blocks::components::button::Button;
 
 #[component]
 pub fn Signup() -> Element {
     let mut username = use_signal(|| "".to_string());
     let mut email = use_signal(|| "".to_string());
     let mut password = use_signal(|| "".to_string());
-    let mut error_msg = use_signal(|| Option::<String>::None);
     let nav = use_navigator();
 
     let handle_submit = move |e: Event<FormData>| async move {
         e.prevent_default();
-        error_msg.set(None);
 
         let req = RegisterRequest {
             username: username(),
@@ -30,7 +30,7 @@ pub fn Signup() -> Element {
                 nav.push(Route::Login {});
             }
             Err(e) => {
-                error_msg.set(Some(e.to_string()));
+                println!("Register error: {}", e);
             }
         }
     };
@@ -45,43 +45,41 @@ pub fn Signup() -> Element {
                     onsubmit: handle_submit,
                     class: "space-y-5",
                     div {
-                        Label { "Username" }
+                        Label { html_for: "username", class: "mb-1", "Username" }
                         Input {
-                            full_width: true,
+                            id: "username",
                             value: username(),
-                            on_change: move |e: FormEvent| username.set(e.value()),
+                            oninput: move |e: FormEvent| username.set(e.value()),
+                            r#type: "text",
                             required: true,
                             placeholder: "johndoe",
                         }
                     }
                     div {
-                        Label { "Email" }
+                        Label { html_for: "email", class: "mb-1", "Email" }
                         Input {
-                            input_type: "email",
-                            full_width: true,
+                            id: "email",
+                            r#type: "email",
                             value: email(),
-                            on_change: move |e: FormEvent| email.set(e.value()),
+                            oninput: move |e: FormEvent| email.set(e.value()),
                             required: true,
                             placeholder: "you@example.com",
                         }
                     }
                     div {
-                        Label { "Password" }
+                        Label { html_for: "password", class: "mb-1", "Password" }
                         Input {
-                            input_type: "password",
-                            full_width: true,
+                            id: "password",
+                            r#type: "password",
                             value: password(),
-                            on_change: move |e: FormEvent| password.set(e.value()),
+                            oninput: move |e: FormEvent| password.set(e.value()),
                             required: true,
                             placeholder: "••••••••",
                         }
                     }
-                    if let Some(msg) = error_msg() {
-                        div { class: "text-red-500 text-sm p-2 bg-red-50 rounded", "{msg}" }
-                    }
                     Button {
-                        button_type: "submit",
-                        full_width: true,
+                        class: "w-full",
+                        r#type: "submit",
                         "Sign up"
                     }
                 }

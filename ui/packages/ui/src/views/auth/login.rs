@@ -1,21 +1,24 @@
+use crate::components::{
+    button::{Button, ButtonVariant},
+    input::Input,
+    label::Label,
+};
 use crate::io::auth::login;
+use crate::io::session;
 use crate::types::LoginRequest;
+use crate::app::UserContext;
 use crate::Route;
 use dioxus::prelude::*;
-use lumen_blocks::components::input::Input;
-use lumen_blocks::components::label::Label;
-use lumen_blocks::components::button::Button;
 
 #[component]
 pub fn Login() -> Element {
     let mut email = use_signal(|| "".to_string());
     let mut password = use_signal(|| "".to_string());
-    let mut error_msg = use_signal(|| Option::<String>::None);
     let nav = use_navigator();
+    let mut user_context = use_context::<UserContext>();
 
     let handle_submit = move |e: Event<FormData>| async move {
         e.prevent_default();
-        error_msg.set(None);
 
         let req = LoginRequest {
             email: email(),
@@ -24,19 +27,16 @@ pub fn Login() -> Element {
 
         match login(req).await {
             Ok(resp) => {
-                // Set Cookie on Client Side via JS eval
-                // This allows subsequent SSR requests to carry the token
-                let js = format!(
-                    "document.cookie = 'token={}; Path=/; SameSite=Lax; Max-Age=86400';",
-                    resp.token
-                );
-                // Dioxus 0.7 document::eval
-                let _ = document::eval(&js);
+                // Use session abstraction to save auth (Token + User Info)
+                session::save_auth(&resp.member, &resp.token).await;
+
+                // Update Global State
+                user_context.0.set(Some(resp.member));
 
                 nav.push(Route::ToolList {});
             }
             Err(e) => {
-                error_msg.set(Some(e.to_string()));
+                println!("Login error: {}", e);
             }
         }
     };
@@ -51,33 +51,30 @@ pub fn Login() -> Element {
                     onsubmit: handle_submit,
                     class: "space-y-5",
                     div {
-                        Label { "Email" }
+                        Label { html_for: "email", class: "mb-1", "Email" }
                         Input {
-                            input_type: "email",
-                            full_width: true,
+                            id: "email",
+                            r#type: "email",
                             value: email(),
-                            on_change: move |e: FormEvent| email.set(e.value()),
+                            oninput: move |e: FormEvent| email.set(e.value()),
                             required: true,
                             placeholder: "you@example.com",
                         }
                     }
                     div {
-                        Label { "Password" }
+                        Label { html_for: "password", class: "mb-1", "Password" }
                         Input {
-                            input_type: "password",
-                            full_width: true,
+                            id: "password",
+                            r#type: "password",
                             value: password(),
-                            on_change: move |e: FormEvent| password.set(e.value()),
+                            oninput: move |e: FormEvent| password.set(e.value()),
                             required: true,
                             placeholder: "••••••••",
                         }
                     }
-                    if let Some(msg) = error_msg() {
-                        div { class: "text-red-500 text-sm p-2 bg-red-50 rounded", "{msg}" }
-                    }
                     Button {
-                        button_type: "submit",
-                        full_width: true,
+                        class: "w-full",
+                        r#type: "submit",
                         "Log in"
                     }
                 }
