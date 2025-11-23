@@ -1,0 +1,14 @@
+# Ignore generated tailwind assets
+packages/**/assets/tailwind*
+
+# Rust / Dioxus
+target/
+packages/*/dist/
+packages/*/public/
+*.wasm
+wasm-pack.log
+
+# Node / Frontend
+node_modules/
+package-lock.json
+yarn.lock

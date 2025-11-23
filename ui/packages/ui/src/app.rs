@@ -1,5 +1,6 @@
 use crate::views::{Home, Login, NotFound, Signup, ToolDetail, ToolList};
 use dioxus::prelude::*;
+use lumen_blocks::components::button::{Button, ButtonVariant};
 
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const TAILWIND: Asset = asset!("/assets/tailwind.css");
@@ -36,12 +37,14 @@ pub fn App() -> Element {
 
 #[component]
 fn Layout() -> Element {
+    let nav = use_navigator();
+
     rsx! {
         div {
             class: "min-h-screen bg-gray-50",
             // Navigation bar
             nav {
-                class: "bg-white shadow-sm",
+                class: "bg-white shadow-sm sticky top-0 z-50 border-b border-gray-200",
                 div {
                     class: "max-w-7xl mx-auto px-4 sm:px-6 lg:px-8",
                     div {
@@ -49,21 +52,34 @@ fn Layout() -> Element {
                         div {
                             class: "flex items-center space-x-8",
                             h1 {
-                                class: "text-2xl font-bold text-gray-900",
+                                class: "text-2xl font-bold text-gray-900 cursor-pointer",
+                                onclick: move |_| { nav.push(Route::Home {}); },
                                 "Dioxus Router Demo"
                             }
                             div {
                                 class: "flex items-center space-x-2",
-                                Link {
-                                    to: Route::Home {},
-                                    class: "text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium",
+                                Button {
+                                    variant: ButtonVariant::Ghost,
+                                    on_click: move |_| { nav.push(Route::Home {}); },
                                     "Home"
                                 }
-                                Link {
-                                    to: Route::ToolList {},
-                                    class: "text-gray-600 hover:text-gray-900 px-3 py-2 rounded-md text-sm font-medium",
+                                Button {
+                                    variant: ButtonVariant::Ghost,
+                                    on_click: move |_| { nav.push(Route::ToolList {}); },
                                     "Tools"
                                 }
+                            }
+                        }
+                        div {
+                            class: "flex items-center space-x-4",
+                            Button {
+                                variant: ButtonVariant::Ghost,
+                                on_click: move |_| { nav.push(Route::Login {}); },
+                                "Log in"
+                            }
+                            Button {
+                                on_click: move |_| { nav.push(Route::Signup {}); },
+                                "Sign up"
                             }
                         }
                     }

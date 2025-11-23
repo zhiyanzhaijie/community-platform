@@ -1,7 +1,3 @@
-# Rust
-# Ignore all target directories in the project
-target/
-**/target/
 
 # Rust backup files
 **/*.rs.bk
@@ -42,23 +38,6 @@ Thumbs.db
 *.so
 *.dylib
 
-# Dioxus/Web
-# Web assembly artifacts
-*.wasm
-wasm-pack.log
-
-# Dioxus build output
-ui/packages/*/dist/
-ui/packages/*/public/
-
-
-# UI specific (migrated from ui/.gitignore)
-ui/target
-
-# Node modules (if using npm/yarn for tooling)
-node_modules/
-package-lock.json
-yarn.lock
 
 # AI
 WARP.md
