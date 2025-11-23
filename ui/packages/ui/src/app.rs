@@ -13,9 +13,8 @@ use dioxus::prelude::*;
 const FAVICON: Asset = asset!("/assets/favicon.ico");
 const TAILWIND: Asset = asset!("/assets/tailwind.css");
 const DX_COMPONENT_STYLE: Asset = asset!("/assets/dx-components-theme.css");
-
 #[derive(Clone, Copy)]
-pub struct UserContext(pub Signal<Option<MemberDto>>);
+pub struct UserContext(pub Resource<Result<Option<MemberDto>, ServerFnError>>);
 #[derive(Routable, Clone, PartialEq)]
 pub enum Route {
     #[layout(Layout)]
@@ -40,23 +39,20 @@ pub enum Route {
 }
 #[component]
 pub fn App() -> Element {
-    use_context_provider(|| UserContext(Signal::new(None)));
-    let mut user_context = use_context::<UserContext>();
-    let _ = use_server_future(move || async move {
-        if let Ok(Some(member)) = get_current_member().await {
-            user_context.0.set(Some(member));
-        }
-    });
+    if let Ok(user_resource) = use_server_future(move || get_current_member()) {
+        use_context_provider(|| UserContext(user_resource));
+    }
+
     rsx! {
         document::Link {
             rel: "icon",
             href: FAVICON,
         }
         document::Stylesheet {
-            href: DX_COMPONENT_STYLE,
+            href: TAILWIND,
         }
         document::Stylesheet {
-            href: TAILWIND,
+            href: DX_COMPONENT_STYLE,
         }
         Router::<Route> {
 
@@ -68,7 +64,13 @@ pub fn App() -> Element {
 fn Layout() -> Element {
     let mut is_collapsed = use_signal(|| false);
     let user_context = use_context::<UserContext>();
-    let current_user = user_context.0();
+    let user_resource = user_context.0;
+
+    let current_user = match user_resource() {
+        Some(Ok(Some(member))) => Some(member),
+        _ => None,
+    };
+
     let width_class = if is_collapsed() { "w-16" } else { "w-64" };
     let margin_class = if is_collapsed() {
         "md:ml-16"
@@ -91,11 +93,13 @@ fn Layout() -> Element {
                 class: "hidden md:flex bg-white border-r border-gray-200 flex-shrink-0 fixed inset-y-0 left-0 z-50 flex-col transition-all duration-300 {width_class}",
                 // Simple sidebar toggle button
                 div {
-                    class: "absolute -right-3 top-20 z-50",
-                    Button {
-                        variant: ButtonVariant::Outline,
-                        class: "rounded-full w-6 h-6 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center justify-center text-xs p-0",
-                        onclick: move |_| is_collapsed.set(!is_collapsed()),
+                    class: "absolute -right-3 top-20 z-[100]",
+                    button {
+                        class: "rounded-full w-6 h-6 bg-white shadow-sm border border-gray-200 hover:bg-gray-50 flex items-center justify-center text-xs p-0 cursor-pointer",
+                        onclick: move |_| {
+                            web_sys::console::log_1(&format!("Sidebar toggle clicked. Current state: {}", is_collapsed()).into());
+                            is_collapsed.set(!is_collapsed());
+                        },
                         if is_collapsed() {
                             ">" // ▶
                         } else {
@@ -161,6 +165,8 @@ fn Navigation(_is_mobile: bool, is_collapsed: bool, user: Option<MemberDto>) -> 
                 }
             }
             Separator {
+
+
             }
             // 2. Features Navigation
             nav {
@@ -192,6 +198,8 @@ fn Navigation(_is_mobile: bool, is_collapsed: bool, user: Option<MemberDto>) -> 
             }
             // 3. Placeholder simple auth section (no dropdown / avatar)
             Separator {
+
+
             }
             div {
                 class: "p-4 mt-auto flex items-center justify-between text-sm text-gray-600",

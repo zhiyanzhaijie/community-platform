@@ -30,8 +30,8 @@ pub fn Login() -> Element {
                 // Use session abstraction to save auth (Token + User Info)
                 session::save_auth(&resp.member, &resp.token).await;
 
-                // Update Global State
-                user_context.0.set(Some(resp.member));
+                // Restart resource to refresh global state
+                user_context.0.restart();
 
                 nav.push(Route::ToolList {});
             }
